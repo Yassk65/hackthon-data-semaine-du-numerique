@@ -255,7 +255,7 @@ def region_predictions(preds_prov: pd.DataFrame, ind_prov: pd.DataFrame) -> pd.D
     rows = []
     for (r, yr), g in p.groupby(["reg", "annee_scolaire"]):
         w = g.w if g.w.sum() > 0 else pd.Series(1.0, index=g.index)
-        rec = {"code": r, "annee_scolaire": yr}
+        rec = {"code": r, "annee_scolaire": yr, "hors_echantillon": bool(g.hors_echantillon.all())}
         for c in cols:
             ok = g[c].notna()
             rec[c] = float(np.average(g[c][ok], weights=w[ok])) if ok.any() and w[ok].sum() > 0 else np.nan
