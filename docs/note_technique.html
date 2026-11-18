@@ -37,7 +37,7 @@ figcaption { font-size: 7.8pt; color: var(--muted); margin-top: 3pt; }
 <li>une <strong>base de données propre et traçable</strong> : 253 785 valeurs extraites des huit annuaires du primaire (2017-18 à 2024-25), chacune avec son document, sa page, sa ligne et un indicateur de qualité. Les 19 valeurs de contrôle de l'annuaire 2023-24 sont retrouvées à l'identique ;</li>
 <li>une <strong>harmonisation territoriale</strong> vers le découpage de 2025 (17 régions, 47 provinces), utilisé pour toutes les cartes ;</li>
 <li>un <strong>indice composite de risque</strong> transparent (5 dimensions, 12 indicateurs) et un <strong>modèle d'anticipation</strong> validé dans le temps et dans l'espace, avec des intervalles d'incertitude ;</li>
-<li>une <strong>application web</strong> autonome (sans serveur ni tuiles externes), en quatre vues : Comprendre, Explorer, Anticiper, Méthode et données.</li>
+<li>une <strong>application web</strong> autonome (sans serveur ni tuiles externes), en quatre vues : Comprendre, Explorer, Anticiper, Méthode et données. Elle est en ligne : <a href="https://hackatho-data-equipe-yassk65.netlify.app/">https://hackatho-data-equipe-yassk65.netlify.app/</a>.</li>
 </ul>
 <p>Pour 2025-26, <strong>13 provinces sur 47</strong> ont au moins une chance sur deux de dépasser 15 % de déperdition. Elles se concentrent dans les régions Yaadga (3), Koulsé (2), Liptako (2), Soum (2), Tapoa (2).</p>
 <h2>1. Données et périmètre</h2>
@@ -350,7 +350,7 @@ figcaption { font-size: 7.8pt; color: var(--muted); margin-top: 3pt; }
 <h2>9. L'application web</h2>
 <figure><img src="figures/application_explorer.png" alt="Vue Explorer de l'application"><figcaption>Vue Explorer : carte des provinces, classement synchronisé, fiche de la province.</figcaption></figure>
 
-<p>L'application est une page statique (Vite, React, TypeScript, MapLibre GL), déployable gratuitement sur GitHub Pages, Netlify ou Vercel. La carte est construite sur nos propres polygones, sans tuiles ni polices externes : elle fonctionne avec une connexion faible. Les couches lourdes (écoles OSM, modèle, journal de qualité) sont chargées à la demande.</p>
+<p>L'application est une page statique (Vite, React, TypeScript, MapLibre GL), publiée sur Netlify (<a href="https://hackatho-data-equipe-yassk65.netlify.app/">https://hackatho-data-equipe-yassk65.netlify.app/</a>), sans serveur applicatif ni base de données. La carte est construite sur nos propres polygones, sans tuiles ni polices externes : elle fonctionne avec une connexion faible. Les couches lourdes (écoles OSM, modèle, journal de qualité) sont chargées à la demande.</p>
 <ul>
 <li><strong>Comprendre</strong> : chiffres d'accroche, trois constats et mode d'emploi, tous calculés à partir des données.</li>
 <li><strong>Explorer</strong> : carte plein écran à deux échelles (régions et provinces), 11 couches, dont une carte bivariée risque × fermetures. Curseur temporel avec lecture animée, comparaison avant/après, hachures pour les données manquantes et points pour les données fragiles. Classement triable et filtrable, synchronisé avec la carte, et recherche. La fiche province présente les indicateurs clés, les mini-graphiques, l'écart filles-garçons, le rang, la prévision avec son intervalle, les facteurs, la qualité et les sources. On peut comparer deux provinces. Exports : image PNG, CSV, fiche imprimable en PDF. Le lien conserve la vue partagée.</li>

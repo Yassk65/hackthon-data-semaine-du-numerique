@@ -11,7 +11,7 @@ Nous proposons un outil d'aide à la décision qui répond à la question du dé
 - une **base de données propre et traçable** : 253 785 valeurs extraites des huit annuaires du primaire (2017-18 à 2024-25), chacune avec son document, sa page, sa ligne et un indicateur de qualité. Les 19 valeurs de contrôle de l'annuaire 2023-24 sont retrouvées à l'identique ;
 - une **harmonisation territoriale** vers le découpage de 2025 (17 régions, 47 provinces), utilisé pour toutes les cartes ;
 - un **indice composite de risque** transparent (5 dimensions, 12 indicateurs) et un **modèle d'anticipation** validé dans le temps et dans l'espace, avec des intervalles d'incertitude ;
-- une **application web** autonome (sans serveur ni tuiles externes), en quatre vues : Comprendre, Explorer, Anticiper, Méthode et données.
+- une **application web** autonome (sans serveur ni tuiles externes), en quatre vues : Comprendre, Explorer, Anticiper, Méthode et données. Elle est en ligne : [https://hackatho-data-equipe-yassk65.netlify.app/](https://hackatho-data-equipe-yassk65.netlify.app/).
 
 Pour 2025-26, **13 provinces sur 47** ont au moins une chance sur deux de dépasser 15 % de déperdition. Elles se concentrent dans les régions Yaadga (3), Koulsé (2), Liptako (2), Soum (2), Tapoa (2).
 
@@ -139,7 +139,7 @@ L'indice résume la situation observée d'une province en 12 indicateurs regroup
 
 <figure><img src="figures/application_explorer.png" alt="Vue Explorer de l'application"><figcaption>Vue Explorer : carte des provinces, classement synchronisé, fiche de la province.</figcaption></figure>
 
-L'application est une page statique (Vite, React, TypeScript, MapLibre GL), déployable gratuitement sur GitHub Pages, Netlify ou Vercel. La carte est construite sur nos propres polygones, sans tuiles ni polices externes : elle fonctionne avec une connexion faible. Les couches lourdes (écoles OSM, modèle, journal de qualité) sont chargées à la demande.
+L'application est une page statique (Vite, React, TypeScript, MapLibre GL), publiée sur Netlify ([https://hackatho-data-equipe-yassk65.netlify.app/](https://hackatho-data-equipe-yassk65.netlify.app/)), sans serveur applicatif ni base de données. La carte est construite sur nos propres polygones, sans tuiles ni polices externes : elle fonctionne avec une connexion faible. Les couches lourdes (écoles OSM, modèle, journal de qualité) sont chargées à la demande.
 
 - **Comprendre** : chiffres d'accroche, trois constats et mode d'emploi, tous calculés à partir des données.
 - **Explorer** : carte plein écran à deux échelles (régions et provinces), 11 couches, dont une carte bivariée risque × fermetures. Curseur temporel avec lecture animée, comparaison avant/après, hachures pour les données manquantes et points pour les données fragiles. Classement triable et filtrable, synchronisé avec la carte, et recherche. La fiche province présente les indicateurs clés, les mini-graphiques, l'écart filles-garçons, le rang, la prévision avec son intervalle, les facteurs, la qualité et les sources. On peut comparer deux provinces. Exports : image PNG, CSV, fiche imprimable en PDF. Le lien conserve la vue partagée.
