@@ -180,7 +180,8 @@ Data Challenge Burkina 2026, **Défi 1 : décrochage scolaire**. Équipe : {" et
 
 Les noms de fichiers suivent `EQUIPE_ÉTAPE_DÉFI_RÔLE_description_vN` : équipe `{b.equipe}`, étape `01` à `05`, défi `{DEFI}`,
 rôle (`DATA` : collecte et nettoyage, `ANALYSTE` : indice et modèle, `DEV` : application et backend,
-`REDACTION` : interprétation), version `v{b.version}`. `3_donnees_de_travail/INDEX_fichiers.csv` donne l'origine de chaque fichier dans le dépôt.
+`REDACTION` : interprétation), version `v{b.version}`.
+`3_donnees_de_travail/INDEX_fichiers.csv` donne l'origine de chaque fichier dans le dépôt.
 Les fichiers de plus de 5 Mo sont compressés (.zip).
 
 ## Relancer la solution
