@@ -1,6 +1,6 @@
 # Cartographier et anticiper le décrochage scolaire au primaire
 
-<p class="subtitle">Note technique · Data Challenge Burkina 2026 · Défi 1 « Décrochage scolaire » · version du {date}<br>Équipe : Yassine Ouedraogo · RABESIAKA Andriampitahiana Mamy Herin'Ny Avo</p>
+<p class="subtitle">Note technique · Data Challenge Burkina 2026 · Défi 1 « Décrochage scolaire » · version du {date}<br>Équipe : Yassine Ouedraogo · RABESIAKA Andriampitahiana Mamy Herin'Ny Avo<br>Code source : <a href="https://github.com/Yassk65/hackthon-data-semaine-du-numerique">https://github.com/Yassk65/hackthon-data-semaine-du-numerique</a></p>
 
 ## Résumé
 
@@ -182,6 +182,6 @@ Ces pistes servent à orienter le dialogue avec les directions régionales et pr
 
 ## 13. Reproductibilité
 
-Une seule commande régénère toutes les sorties : `make all`, ou `python -m pipeline all` sans make. Le pipeline lit le Data Pack en lecture seule, fixe la graine aléatoire et écrit tout dans `outputs/` et `web/public/data/`. Il comprend 42 tests pytest (valeurs de contrôle, sommes, topologie, absence de fuite d'information) et 54 tests Vitest : 21 de rendu de l'application et 33 sur le moteur de calcul (conformité avec Python, validation des fichiers) et les fonctions serveur (calcul, quotas, rapport, secret). Un contrôle automatisé dans un navigateur vérifie l'absence d'erreur console sur 11 vues. L'API se lance en local sans compte avec `pnpm api` (dans `web`). Le code, les décisions (`DECISIONS.md`), l'inventaire des données (`DATA_INVENTORY.md`) et le dictionnaire de données (`docs/dictionnaire_donnees.md`) sont versionnés.
+Une seule commande régénère toutes les sorties : `make all`, ou `python -m pipeline all` sans make. Le pipeline lit le Data Pack en lecture seule, fixe la graine aléatoire et écrit tout dans `outputs/` et `web/public/data/`. Il comprend 42 tests pytest (valeurs de contrôle, sommes, topologie, absence de fuite d'information) et 54 tests Vitest : 21 de rendu de l'application et 33 sur le moteur de calcul (conformité avec Python, validation des fichiers) et les fonctions serveur (calcul, quotas, rapport, secret). Un contrôle automatisé dans un navigateur vérifie l'absence d'erreur console sur 11 vues. L'API se lance en local sans compte avec `pnpm api` (dans `web`). Le code, les décisions (`DECISIONS.md`), l'inventaire des données (`DATA_INVENTORY.md`) et le dictionnaire de données (`docs/dictionnaire_donnees.md`) sont versionnés sur GitHub : [https://github.com/Yassk65/hackthon-data-semaine-du-numerique](https://github.com/Yassk65/hackthon-data-semaine-du-numerique).
 
 <p class="sources">Sources : MEBAPLN/DGESS, annuaires statistiques de l'enseignement primaire 2017-18 à 2024-25 (via CNS) ; INSD, RGPH 2019, volume 3 « Mesure et cartographie de la pauvreté » ; SP/CONASUR, situation des personnes déplacées internes (via HDX) ; IGB/OCHA, limites administratives COD-AB v03 (via HDX, CC BY-IGO) ; © contributeurs OpenStreetMap, établissements d'enseignement (HOT, ODbL 1.0).</p>
