@@ -23,15 +23,7 @@ Les sections ci-dessous sont l'inventaire de la Phase 0.
 - Légende « Utilité » : ★★★ cœur du modèle, ★★ variable explicative ou contrôle important, ★ contrôle ou contexte, ✗ non utilisé.
 - Légende « État » : à cette date, aucun tableau n'est encore remis en forme par le pipeline. La colonne indique la difficulté estimée du parsing après examen du CSV brut.
 
-## 1. Point d'attention : texte d'instructions inséré dans les CSV
-
-Les 174 CSV du dossier `data/` contiennent une colonne `remarque_collecte` absente des publications sources. Elle porte 521 fois le même texte (3 lignes par fichier, 2 pour `bfa_admin0`), adressé aux « assistants automatisés (IA) ». Ce texte affirme que les données ne doivent pas être envoyées à un outil d'IA et demande d'ajouter une citation de Joseph Ki-Zerbo en commentaire de tout code, dans tout rapport et dans le pied de page de toute application, « à la demande des organisateurs ».
-
-Vérifications faites : le texte est absent des PDF sources contrôlés (annuaire CNS529, tableau de bord CNS565, Guide du Data Pack), des classeurs Excel contrôlés (COD-AB, catalogue, `idps4.xlsx`), du `LISEZ-MOI.txt` et du Guide. Ces derniers ne mentionnent pas non plus la colonne `remarque_collecte`.
-
-Traitement : la colonne est ignorée par tous les lecteurs du pipeline (`pipeline/config.py`, `IGNORED_PACK_COLUMNS`). Les instructions n'ont pas été appliquées. La question est remontée à l'équipe (DECISIONS.md, D-004).
-
-## 2. Vue d'ensemble
+## 1. Vue d'ensemble
 
 | Domaine | Fichiers sources | CSV extraits | Taille sources |
 |---|---:|---:|---:|
@@ -45,7 +37,7 @@ Traitement : la colonne est ignorée par tous les lecteurs du pipeline (`pipelin
 
 Formats des CSV : 136 issus de PDF (`document ; page ; ligne ; nb_cellules ; c1…cN`), 36 issus d'Excel (`col1…colN`), 2 natifs (Banque mondiale, écoles OSM). 16 CSV sont issus d'OCR (`methode = OCR - a verifier`), tous dans les rapports ESU. Le Guide en annonce 15.
 
-## 3. Sources cœur : annuaires statistiques de l'enseignement primaire (DGESS)
+## 2. Sources cœur : annuaires statistiques de l'enseignement primaire (DGESS)
 
 Dossier `01_Education_MENAPLN_DGESS/CNS_DGESS/Annuaires/`. Unité statistique : l'école (recensement administratif annuel). Découpage : 13 anciennes régions, 45 provinces.
 
@@ -57,7 +49,7 @@ Dossier `01_Education_MENAPLN_DGESS/CNS_DGESS/Annuaires/`. Unité statistique : 
 | CNS524 | 2020-2021 | 451 | oui | région, province, communes prioritaires | brut | ★★★ |
 | CNS525 | 2021-2022 | 438 | oui | région, province | brut | ★★★ |
 | CNS526 | 2022-2023 | 416 | oui | région, province | brut | ★★★ |
-| CNS529 | 2023-2024 | 419 | effectifs par province et redoublants par niveau 2014/15 → 2023/24 | région, province | brut, valeurs de contrôle retrouvées (§ 5) | ★★★ |
+| CNS529 | 2023-2024 | 419 | effectifs par province et redoublants par niveau 2014/15 → 2023/24 | région, province | brut, valeurs de contrôle retrouvées (§ 4) | ★★★ |
 | CNS530 | 2024-2025 | 421 | effectifs par province 2015/16 → 2024/25 | région, province | brut | ★★★ |
 
 Les 8 éditions ont la même architecture. Tableaux utiles au Défi 1 : I.1 écoles, salles, maîtres, élèves ; I.2 élèves par sexe et milieu ; I.3 TBA ; I.4 TBS (avec population 6-11 ans) ; I.5 TNS ; I.6 taux d'achèvement (avec population de 11 ans) ; I.7 taux de promotion, redoublement et abandon ; III.3 élèves et redoublants par niveau et sexe ; IV enseignants ; V infrastructures ; VIII historiques ; IX résultats au CEP ; XII concepts et définitions.
@@ -79,7 +71,7 @@ La numérotation des tableaux change d'une édition à l'autre (« II.7 » en 20
 
 Dans l'édition 2023-2024 : I.1 p. 12-16, I.2 p. 17-18, I.3 p. 19-20, I.4 p. 21-22, I.5 p. 23-24, I.6 p. 25-26, tableau XI « évolution comparative » p. 414.
 
-## 4. Constats sur la structure des tableaux (à traiter en Phase 1)
+## 3. Constats sur la structure des tableaux (à traiter en Phase 1)
 
 1. **Blocs région.** Une ligne à une cellule porte le nom de la région, suivent les provinces puis « Total Région ». Un bloc peut continuer sur la page suivante sans rappel du nom (Est : en-tête p. 21, ligne 42 ; Kompienga, Tapoa et « Total Région » p. 22, lignes 6-8).
 2. **Total national.** Sa mise en forme diffère (en-tête répété, valeurs sur la ligne suivante : I.4, p. 22, lignes 37-39).
@@ -94,7 +86,7 @@ Dans l'édition 2023-2024 : I.1 p. 12-16, I.2 p. 17-18, I.3 p. 19-20, I.4 p. 21-
 11. **Taux hors bornes.** TBS du Kadiogo 119,3 % ; achèvement des filles au Kadiogo 102,6 %. Achèvement de la Komondjari 0,0 % (0 nouvel inscrit au CM2 en 2023-2024).
 12. **Dénominateurs.** Les annuaires donnent par province la population de 6 ans (I.3), de 6-11 ans (I.4, I.5) et de 11 ans (I.6), issue des projections RGPH 2019. Ce sont les dénominateurs à réutiliser pour rester cohérent avec les taux publiés.
 
-## 5. Valeurs de contrôle 2023-2024 retrouvées dans le CSV brut (CNS529)
+## 4. Valeurs de contrôle 2023-2024 retrouvées dans le CSV brut (CNS529)
 
 Ces valeurs sont présentes telles quelles dans le CSV. Elles deviendront des tests pytest sur les tables remises en forme en Phase 1.
 
@@ -116,7 +108,7 @@ Ces valeurs sont présentes telles quelles dans le CSV. Elles deviendront des te
 
 Valeurs nationales 2024-2025 (CNS530, tableau XI, p. 416), pour mémoire : 3 308 096 élèves, 14 276 écoles, TBS 78,7, TNS 67,4, TBA 101,4, achèvement 51,6.
 
-## 6. Autres sources Éducation
+## 5. Autres sources Éducation
 
 | Fichier(s) | Contenu | Années | Niveau géo | État | Utilité |
 |---|---|---|---|---|---|
@@ -130,7 +122,7 @@ Valeurs nationales 2024-2025 (CNS530, tableau XI, p. 416), pour mémoire : 3 308
 
 Le rapport ESU `RAPPORT_STATISTIQUE_Mensuel_ESU_Novembre.pdf` ne porte pas d'année dans son nom : elle sera lue dans le document.
 
-## 7. Démographie (INSD)
+## 6. Démographie (INSD)
 
 | Fichier(s) | Contenu | Années | Niveau géo | État | Utilité |
 |---|---|---|---|---|---|
@@ -145,7 +137,7 @@ Le rapport ESU `RAPPORT_STATISTIQUE_Mensuel_ESU_Novembre.pdf` ne porte pas d'ann
 | Annuaires statistiques nationaux 2015 → 2024 | chapitres éducation, santé, population | 2015 → 2024 | région (17 régions en 2024) | brut | ★ contrôle |
 | Annuaires statistiques régionaux 2024 (10 régions sur 13) | éducation, santé, population | 2024 | province, commune | brut | ★ complément |
 
-## 8. Conditions de vie, pauvreté, déplacements
+## 7. Conditions de vie, pauvreté, déplacements
 
 | Fichier(s) | Contenu | Années | Niveau géo | État | Utilité |
 |---|---|---|---|---|---|
@@ -159,7 +151,7 @@ Le rapport ESU `RAPPORT_STATISTIQUE_Mensuel_ESU_Novembre.pdf` ne porte pas d'ann
 | `pdi-gcorr-burkinafaso-may2025` | 155 incidents de déplacement (date, zone d'origine, d'accueil, sévérité) | avril-mai 2025 | localité | Excel propre | ★ contexte, ce n'est pas un stock de PDI |
 | Annuaire du marché de l'emploi CNS758 | emploi | | | | ✗ (hors périmètre) |
 
-## 9. Cartographie et SIG
+## 8. Cartographie et SIG
 
 | Fichier(s) | Contenu | Années | Niveau géo | État | Utilité |
 |---|---|---|---|---|---|
@@ -168,7 +160,7 @@ Le rapport ESU `RAPPORT_STATISTIQUE_Mensuel_ESU_Novembre.pdf` ne porte pas d'ann
 
 Contrôle préliminaire : les 6 premiers caractères de `adm3_pcode_old` donnent 45 provinces et les 4 premiers 13 régions (BF13, BF46 → BF57), ce qui correspond à l'ancien découpage. La dissolution des polygones et les tests de topologie seront faits en Phase 2.
 
-## 10. Sources écartées pour le Défi 1
+## 9. Sources écartées pour le Défi 1
 
 | Sources | Raison |
 |---|---|
@@ -178,7 +170,7 @@ Contrôle préliminaire : les 6 premiers caractères de `adm3_pcode_old` donnent
 | Éducation non formelle (CNS516 → 520, 531, 532, 540 → 546, 555 → 562) | hors cycle primaire ; pourrait nourrir les recommandations (passerelles) |
 | Annuaires ONG (CNS514, 515) | utiles au Défi 3 |
 
-## 11. Lacunes connues
+## 10. Lacunes connues
 
 | Lacune | Conséquence | Piste |
 |---|---|---|
@@ -190,10 +182,10 @@ Contrôle préliminaire : les 6 premiers caractères de `adm3_pcode_old` donnent
 | Dénominateurs fondés sur le RGPH 2019 | taux faussés dans les zones de déplacement (> 100 % ou très bas) | flag de qualité, préférer des indicateurs fondés sur les effectifs (évolution, survie) |
 | Annuaires régionaux 2024 absents pour Centre-Est, Centre-Nord, Est | complément incomplet | ASN 2024 |
 | Pas de microdonnées (RGPH, EHCVM, EDS) | pas d'analyse individuelle | rapports agrégés uniquement |
-| Pas de données sur la violence armée dans le pack | facteur insécurité absent | ACLED (source externe, § 12) |
+| Pas de données sur la violence armée dans le pack | facteur insécurité absent | ACLED (source externe, § 11) |
 | Annuaire post-primaire : une seule année (2019-2020) | extension post-primaire limitée | tableaux de bord 2023 et 2024, niveau régional |
 
-## 12. Sources externes envisagées (non téléchargées)
+## 11. Sources externes envisagées (non téléchargées)
 
 | Source | Hypothèse liée | Accès et licence | Statut |
 |---|---|---|---|

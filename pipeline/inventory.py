@@ -2,8 +2,7 @@
 
 Écrit outputs/inventory/inventaire_fichiers.csv : une ligne par fichier du pack
 (source ou CSV extrait) avec sa taille et, pour les CSV, quelques statistiques
-de structure (lignes, pages, méthode d'extraction, lignes portant une remarque
-de collecte). Lecture seule sur le Data Pack.
+de structure (lignes, pages, méthode d'extraction). Lecture seule sur le Data Pack.
 
 Usage : python -m pipeline.inventory
 """
@@ -11,7 +10,7 @@ Usage : python -m pipeline.inventory
 import csv
 from pathlib import Path
 
-from pipeline.config import CSV_DIR, IGNORED_PACK_COLUMNS, OUTPUTS_DIR, RAW_DIR
+from pipeline.config import CSV_DIR, OUTPUTS_DIR, RAW_DIR
 
 PDF_COLUMNS = {"document", "page", "ligne", "nb_cellules"}
 FIELDS = [
@@ -24,13 +23,12 @@ FIELDS = [
     "n_lignes",
     "n_pages",
     "methode_extraction",
-    "lignes_remarque_collecte",
 ]
 
 
 def csv_stats(path: Path) -> dict:
     """Statistiques de structure d'un CSV du pack (séparateur « ; », UTF-8)."""
-    stats = {"n_lignes": 0, "n_pages": "", "methode_extraction": "", "lignes_remarque_collecte": 0}
+    stats = {"n_lignes": 0, "n_pages": "", "methode_extraction": ""}
     with path.open(encoding="utf-8-sig", newline="") as fh:
         reader = csv.reader(fh, delimiter=";")
         header = next(reader, [])
@@ -42,7 +40,6 @@ def csv_stats(path: Path) -> dict:
         else:
             stats["format_csv"] = "natif"
         pages, methods = set(), set()
-        remark_cols = [idx[c] for c in IGNORED_PACK_COLUMNS if c in idx]
         for row in reader:
             stats["n_lignes"] += 1
             i = idx.get("page")
@@ -51,8 +48,6 @@ def csv_stats(path: Path) -> dict:
             i = idx.get("methode")
             if i is not None and i < len(row) and row[i]:
                 methods.add(row[i])
-            if any(j < len(row) and row[j].strip() for j in remark_cols):
-                stats["lignes_remarque_collecte"] += 1
         stats["n_pages"] = max(pages) if pages else ""
         stats["methode_extraction"] = " / ".join(sorted(methods))
     return stats
@@ -91,9 +86,7 @@ def main() -> None:
     n_src = sum(r["role"] == "source" for r in rows)
     n_csv = sum(r["role"] == "csv_extrait" for r in rows)
     n_ocr = sum("OCR" in str(r.get("methode_extraction", "")) for r in rows)
-    n_rem = sum(1 for r in rows if r.get("lignes_remarque_collecte"))
-    print(f"{out} : {n_src} fichiers sources, {n_csv} CSV extraits, "
-          f"{n_ocr} CSV OCR, {n_rem} CSV avec remarque_collecte")
+    print(f"{out} : {n_src} fichiers sources, {n_csv} CSV extraits, {n_ocr} CSV OCR")
 
 
 if __name__ == "__main__":

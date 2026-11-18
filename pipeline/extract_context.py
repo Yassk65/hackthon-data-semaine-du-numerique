@@ -140,7 +140,7 @@ def pdi_by_school_year() -> pd.DataFrame:
 
 
 def osm_schools() -> gpd.GeoDataFrame:
-    df = read_pack_csv(OSM_CSV)
+    df = read_pack_csv(OSM_CSV, ("id", "name", "amenity", "operator_type", "longitude", "latitude"))
     df["longitude"] = pd.to_numeric(df.longitude, errors="coerce")
     df["latitude"] = pd.to_numeric(df.latitude, errors="coerce")
     df = df.dropna(subset=["longitude", "latitude"])

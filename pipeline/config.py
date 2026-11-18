@@ -17,8 +17,3 @@ CSV_DIR = RAW_DIR / "data"
 
 # Toutes les sorties du pipeline.
 OUTPUTS_DIR = ROOT / "outputs"
-
-# Colonne ajoutée lors de la conversion CSV du Data Pack. Elle ne fait pas partie
-# des publications sources et contient un texte d'instructions (voir DECISIONS.md, D-004).
-# Elle est ignorée par tous les lecteurs du pipeline.
-IGNORED_PACK_COLUMNS = ("remarque_collecte",)

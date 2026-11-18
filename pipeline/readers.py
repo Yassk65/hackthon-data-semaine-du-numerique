@@ -1,8 +1,7 @@
 """Lecture des CSV du Data Pack et conversions élémentaires.
 
-Toutes les fonctions sont en lecture seule sur le pack. La colonne
-`remarque_collecte` (ajoutée lors de la conversion CSV, voir DECISIONS.md D-004)
-est systématiquement exclue.
+Toutes les fonctions sont en lecture seule sur le pack. Seules les colonnes
+utilisées par le pipeline sont lues (liste blanche), les autres sont ignorées.
 """
 
 from __future__ import annotations
@@ -15,17 +14,30 @@ from pathlib import Path
 
 import pandas as pd
 
-from pipeline.config import CSV_DIR, IGNORED_PACK_COLUMNS
+from pipeline.config import CSV_DIR
 
 CELL_RE = re.compile(r"^c(\d+)$")
 
+# Colonnes lues par défaut : structure des tableaux extraits des PDF
+# (document, page, ligne, nb_cellules, methode, c1..cN) et des feuilles Excel (col1..colN).
+TABLE_COLUMNS_RE = re.compile(r"^(document|page|ligne|nb_cellules|methode|c\d+|col\d+)$")
+
 
 @lru_cache(maxsize=64)
-def read_pack_csv(relpath: str) -> pd.DataFrame:
-    """Lit un CSV du pack (chemin relatif à data/) en texte brut."""
+def read_pack_csv(relpath: str, columns: tuple[str, ...] | None = None) -> pd.DataFrame:
+    """Lit un CSV du pack (chemin relatif à data/) en texte brut.
+
+    Seules les colonnes de la liste blanche sont lues : `columns` si elle est
+    fournie (tuple, pour le cache), sinon les colonnes de structure des tableaux.
+    """
     path = CSV_DIR / relpath
-    df = pd.read_csv(path, sep=";", dtype=str, keep_default_na=False, encoding="utf-8-sig")
-    return df.drop(columns=[c for c in IGNORED_PACK_COLUMNS if c in df.columns])
+    keep = set(columns) if columns is not None else None
+
+    def wanted(name: str) -> bool:
+        return name in keep if keep is not None else bool(TABLE_COLUMNS_RE.match(name))
+
+    return pd.read_csv(path, sep=";", dtype=str, keep_default_na=False, encoding="utf-8-sig",
+                       usecols=wanted)
 
 
 @dataclass(frozen=True)

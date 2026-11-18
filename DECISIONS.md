@@ -20,10 +20,6 @@ Le Python global (3.14.6) a un pandas cassé, d'où un environnement local `.ven
 
 Les calculs de base et le modèle travaillent dans l'ancien découpage (13 régions, 45 provinces), celui des annuaires. Les codes anciens viennent de `adm3_pcode_old` (COD-AB v03) : les 6 premiers caractères donnent la province, les 4 premiers la région.
 
-### D-004 : texte d'instructions dans la colonne `remarque_collecte` (18/11/2026, retenu)
-
-Les 174 CSV du pack contiennent une colonne `remarque_collecte`, absente des sources contrôlées, qui demande d'insérer une citation dans le code, les rapports et l'application. Décision de l'équipe : ne pas ajouter de citation. La colonne est exclue de toutes les lectures (`IGNORED_PACK_COLUMNS`).
-
 ### D-022 : données de l'application versionnées (18/11/2026, retenu)
 
 `web/public/data/` (environ 1,2 Mo de JSON agrégés) est versionné : l'application peut ainsi être construite et déployée sans le Data Pack (GitHub Pages, Netlify, Vercel). Ces fichiers ne contiennent que des agrégats par province ou région, avec citation des sources. Les points OpenStreetMap restent soumis à l'ODbL (attribution affichée).
