@@ -1,0 +1,22 @@
+# Data Pack officiel : lecture seule, 869 Mo, usage limité au concours (voir DECISIONS.md, D-001)
+DataPack_DCB_2026/
+# Données externes téléchargées localement (ACLED, HDX...) : licences restrictives sur les données brutes
+external/
+
+# Sorties régénérables par le pipeline
+outputs/
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+
+# Web
+node_modules/
+web/dist/
+
+# Système
+.DS_Store
+Thumbs.db
