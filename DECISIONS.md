@@ -107,6 +107,10 @@ Rang centile annuel, 5 dimensions à poids égaux, classes en quintiles annuels.
 
 16 rapports sur 25 sont issus de reconnaissance optique (OCR) et non vérifiés, et la série est discontinue. Les fermetures d'écoles sont mesurées par les annuaires (écoles en activité par rapport au maximum), source homogène et vérifiée.
 
+### D-023 : backend de calcul et rapport par IA (18/11/2026, retenu)
+
+Netlify n'exécute pas Python : le moteur de recalcul est réécrit en TypeScript (`web/engine/`) et reste soumis au pipeline, dont il lit les coefficients (`python -m pipeline engine`). Des tests le comparent au pipeline (10⁻⁹). Le calcul tourne en fonction d'arrière-plan avec suivi par interrogation ; les jobs sont conservés 2 jours dans Netlify Blobs, sans partage entre visiteurs. La version de référence n'est jamais modifiée. Le modèle n'est pas réajusté lors d'une mise à jour. Le rapport de secours est un gabarit ; la rédaction par IA (OpenRouter) n'est active qu'avec une clé côté serveur, ne reçoit que des résultats agrégés, et ses chiffres sont contrôlés. Plafonds journaliers par adresse (hachée) et globaux.
+
 ### D-021 : sources externes (18/11/2026, retenu)
 
 Aucun export ACLED n'a été fourni : la couche « Événements de violence » est affichée comme non disponible. Les prévisions de déplacement HDX n'ont pas été intégrées. Les déplacés internes CONASUR (jusqu'en mars 2023) sont affichés sur la carte, mais exclus du modèle faute de données pour les deux dernières années.

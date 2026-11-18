@@ -1,6 +1,6 @@
 # Cartographier et anticiper le décrochage scolaire au primaire
 
-<p class="subtitle">Note technique · Data Challenge Burkina 2026 · Défi 1 « Décrochage scolaire » · version du {date}</p>
+<p class="subtitle">Note technique · Data Challenge Burkina 2026 · Défi 1 « Décrochage scolaire » · version du {date}<br>Équipe : Yassine Ouedraogo · RABESIAKA Andriampitahiana Mamy Herin'Ny Avo</p>
 
 ## Résumé
 
@@ -11,7 +11,8 @@ Nous proposons un outil d'aide à la décision qui répond à la question du dé
 - une **base de données propre et traçable** : {n_values} valeurs extraites des huit annuaires du primaire (2017-18 à 2024-25), chacune avec son document, sa page, sa ligne et un indicateur de qualité. Les {controls_total} valeurs de contrôle de l'annuaire 2023-24 sont retrouvées à l'identique ;
 - une **harmonisation territoriale** vers le découpage de 2025 (17 régions, 47 provinces), utilisé pour toutes les cartes ;
 - un **indice composite de risque** transparent (5 dimensions, 12 indicateurs) et un **modèle d'anticipation** validé dans le temps et dans l'espace, avec des intervalles d'incertitude ;
-- une **application web** autonome (sans serveur ni tuiles externes), en quatre vues : Comprendre, Explorer, Anticiper, Méthode et données. Elle est en ligne : [https://hackatho-data-equipe-yassk65.netlify.app/](https://hackatho-data-equipe-yassk65.netlify.app/).
+- une **application web** autonome (la carte n'utilise ni tuiles ni polices externes), en cinq vues : Comprendre, Explorer, Anticiper, Méthode et données, Mettre à jour. Elle est en ligne : [https://hackatho-data-equipe-yassk65.netlify.app/](https://hackatho-data-equipe-yassk65.netlify.app/) ;
+- un **backend de calcul** (fonctions Netlify) qui recalcule l'indice et la prévision à partir d'un fichier déposé dans l'application, en arrière-plan, et prépare un rapport de synthèse, rédigé par un modèle de langage si une clé est configurée côté serveur.
 
 Pour 2025-26, **{n_alerte} provinces sur 47** ont au moins une chance sur deux de dépasser {seuil} % de déperdition. Elles se concentrent dans les régions {regions_alerte}.
 
@@ -123,16 +124,42 @@ L'indice résume la situation observée d'une province en 12 indicateurs regroup
 
 <figure><img src="{fig_app}" alt="Vue Explorer de l'application"><figcaption>Vue Explorer : carte des provinces, classement synchronisé, fiche de la province.</figcaption></figure>
 
-L'application est une page statique (Vite, React, TypeScript, MapLibre GL), publiée sur Netlify ([https://hackatho-data-equipe-yassk65.netlify.app/](https://hackatho-data-equipe-yassk65.netlify.app/)), sans serveur applicatif ni base de données. La carte est construite sur nos propres polygones, sans tuiles ni polices externes : elle fonctionne avec une connexion faible. Les couches lourdes (écoles OSM, modèle, journal de qualité) sont chargées à la demande.
+L'application est une page statique (Vite, React, TypeScript, MapLibre GL), publiée sur Netlify ([https://hackatho-data-equipe-yassk65.netlify.app/](https://hackatho-data-equipe-yassk65.netlify.app/)). Les vues de lecture n'ont besoin d'aucun serveur : leurs données sont des fichiers JSON statiques. La carte est construite sur nos propres polygones, sans tuiles ni polices externes : elle fonctionne avec une connexion faible. Les couches lourdes (écoles OSM, modèle, journal de qualité) sont chargées à la demande.
 
 - **Comprendre** : chiffres d'accroche, trois constats et mode d'emploi, tous calculés à partir des données.
 - **Explorer** : carte plein écran à deux échelles (régions et provinces), 11 couches, dont une carte bivariée risque × fermetures. Curseur temporel avec lecture animée, comparaison avant/après, hachures pour les données manquantes et points pour les données fragiles. Classement triable et filtrable, synchronisé avec la carte, et recherche. La fiche province présente les indicateurs clés, les mini-graphiques, l'écart filles-garçons, le rang, la prévision avec son intervalle, les facteurs, la qualité et les sources. On peut comparer deux provinces. Exports : image PNG, CSV, fiche imprimable en PDF. Le lien conserve la vue partagée.
 - **Anticiper** : classement 2025-26, comparaison du modèle aux références, incertitude, importance des variables et pistes d'action.
 - **Méthode et données** : sources et licences, définitions, table de correspondance des découpages, journal de qualité, limites.
+- **Mettre à jour** : modèle de fichier à télécharger, dépôt et validation du fichier, calcul en arrière-plan, résultats, rapport de synthèse (section 10).
 
 Accessibilité : contrastes AA, navigation au clavier, rôles ARIA. Une alternative textuelle décrit la carte et le tableau de classement en donne toutes les valeurs. Le mode sombre et la préférence « mouvement réduit » sont respectés. Toutes les valeurs affichées proviennent des fichiers exportés par le pipeline.
 
-## 10. Recommandations par type de province
+## 10. Backend de calcul, mise à jour des données et rapport automatique
+
+Le pipeline Python (extraction, harmonisation, entraînement) tourne hors ligne. Pour qu'un utilisateur puisse mettre à jour les données sans installer Python, nous avons ajouté un backend : des fonctions serveur Netlify, écrites en TypeScript, qui rejouent l'étape légère du pipeline, de la situation d'une année scolaire jusqu'à la prévision.
+
+<figure><svg viewBox="0 0 720 196" role="img" aria-label="Architecture du backend : le navigateur appelle trois fonctions Netlify ; elles utilisent le moteur de calcul, le stockage Netlify Blobs et OpenRouter" style="width:100%;height:auto;font-family:Inter,Arial,sans-serif;font-size:10.5px;fill:#1f1c17"><defs><marker id="ar" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#3a352d"/></marker></defs><rect x="6" y="58" width="132" height="84" rx="5" fill="#f4efe5" stroke="#1f1c17"/><text x="72" y="84" text-anchor="middle" font-weight="600">Navigateur</text><text x="72" y="100" text-anchor="middle">application React</text><text x="72" y="114" text-anchor="middle">validation du fichier</text><text x="72" y="128" text-anchor="middle">suivi du calcul</text><rect x="228" y="8" width="176" height="42" rx="5" fill="#f3dfd5" stroke="#b4462c"/><text x="316" y="26" text-anchor="middle" font-weight="600">POST /api/jobs</text><text x="316" y="40" text-anchor="middle">calcul, en arrière-plan</text><rect x="228" y="77" width="176" height="42" rx="5" fill="#f4efe5" stroke="#1f1c17"/><text x="316" y="95" text-anchor="middle" font-weight="600">GET /api/jobs/:id</text><text x="316" y="109" text-anchor="middle">état et résultat</text><rect x="228" y="146" width="176" height="42" rx="5" fill="#f3dfd5" stroke="#b4462c"/><text x="316" y="164" text-anchor="middle" font-weight="600">POST /api/report</text><text x="316" y="178" text-anchor="middle">rapport par IA, en arrière-plan</text><rect x="500" y="8" width="212" height="42" rx="5" fill="#f4efe5" stroke="#1f1c17"/><text x="606" y="26" text-anchor="middle" font-weight="600">Moteur de calcul TypeScript</text><text x="606" y="40" text-anchor="middle">variables, indice, prévision</text><rect x="500" y="77" width="212" height="42" rx="5" fill="#f4efe5" stroke="#1f1c17"/><text x="606" y="95" text-anchor="middle" font-weight="600">Netlify Blobs</text><text x="606" y="109" text-anchor="middle">jobs (2 jours), rapports en cache</text><rect x="500" y="146" width="212" height="42" rx="5" fill="#f4efe5" stroke="#1f1c17"/><text x="606" y="164" text-anchor="middle" font-weight="600">OpenRouter</text><text x="606" y="178" text-anchor="middle">modèle de langage, clé côté serveur</text><g stroke="#3a352d" stroke-width="1.2" fill="none" marker-end="url(#ar)"><path d="M138 86 L228 32"/><path d="M138 100 L228 98"/><path d="M138 114 L228 166"/><path d="M404 29 L500 29"/><path d="M404 98 L500 98"/><path d="M404 167 L500 167"/></g></svg><figcaption>Architecture du backend. Les deux fonctions d'arrière-plan répondent tout de suite ; l'application interroge ensuite l'état du job.</figcaption></figure>
+
+**Parcours.** Dans la vue « Mettre à jour », l'utilisateur télécharge un modèle de fichier (la dernière situation connue des 47 provinces), le corrige ou y saisit une nouvelle année, puis le dépose. Le navigateur le valide d'abord (47 provinces, une seule année, colonnes obligatoires, bornes plausibles) avec le même code que le serveur. La demande part à la fonction d'arrière-plan `POST /api/jobs`, qui répond aussitôt ; l'application interroge ensuite `GET /api/jobs/:id` jusqu'au résultat. Celui-ci peut être affiché dans les vues Explorer et Anticiper. La version de référence n'est jamais modifiée et revient en un clic.
+
+**Calculs.** Pour l'année déposée, le moteur recalcule les variables dérivées de l'historique (élèves par maître et par salle, variation des effectifs, perte depuis le maximum, moyenne et volatilité de la déperdition passée), l'indice composite (12 indicateurs, 5 dimensions, classes, facteurs dominants, intervalle de rang sur 2 000 tirages de poids), la déperdition anticipée avec son intervalle et sa probabilité d'alerte, les pistes d'action et les prévisions régionales. Pour une nouvelle année, il confronte aussi la prévision précédente aux valeurs déposées : erreur moyenne, corrélation des rangs, alertes bien détectées, fausses ou manquées.
+
+**Fidélité au pipeline.** Les coefficients de la régression médiane sont exportés par Python et reproduisent ses prévisions à 2·10⁻¹⁶ près. Des tests comparent le moteur TypeScript aux valeurs calculées par Python : variables dérivées des 517 lignes de l'historique, indice, classes, rangs, prévisions, intervalles et probabilités concordent à 10⁻⁹ près. Seuls diffèrent l'intervalle de rang (autre générateur aléatoire : écart moyen inférieur à un rang) et l'ordre des facteurs quand deux contributions sont égales.
+
+**Rapport de synthèse.** Un rapport en français est toujours produit à partir d'un gabarit déterministe. Si une clé OpenRouter est configurée côté serveur, l'utilisateur peut demander une version rédigée par un modèle de langage. Le modèle ne reçoit que des résultats agrégés, jamais le texte du fichier déposé, avec la consigne de n'employer que ces chiffres. Chaque nombre du texte est ensuite confronté aux résultats et ceux qui n'y figurent pas sont signalés. Les textes sont mis en cache selon l'empreinte des données.
+
+**Sécurité et coûts.** La clé n'existe que dans les variables d'environnement du serveur, jamais dans le code ni dans le navigateur. Les jobs sont conservés deux jours et l'adresse IP n'est stockée que sous forme d'empreinte. Des plafonds journaliers limitent les calculs et les rapports par adresse et au total. Aucune donnée personnelle n'est traitée.
+
+| Point d'accès | Rôle |
+|---|---|
+| `POST /api/jobs` | valide le fichier et lance le calcul en arrière-plan |
+| `GET /api/jobs/:id` | état et résultat d'un calcul |
+| `POST /api/report` | rapport rédigé par un modèle de langage, en arrière-plan |
+| `GET /api/status` | disponibilité du service et de la rédaction par IA |
+
+**Portée et état.** Les coefficients ne sont pas réajustés lors d'une mise à jour : le réentraînement se fait avec `python -m pipeline model`. Pour les régions, seules les prévisions sont recalculées. La version en ligne à ce jour est la version statique ; les fonctions s'activent au déploiement par Git ou par la ligne de commande Netlify (`netlify deploy --build --prod`, depuis le dossier `web`), pas par glisser-déposer. Un fichier d'exemple aux données fictives permet d'essayer l'outil sans saisir de chiffres.
+
+## 11. Recommandations par type de province
 
 Les pistes sont déduites des dimensions dominantes de l'indice (score ≥ 60/100) et de l'écart filles-garçons (indice de parité inférieur à 0,95). Elles concernent les provinces prioritaires : indice élevé ou probabilité d'alerte d'au moins 50 %.
 
@@ -142,7 +169,7 @@ Les pistes sont déduites des dimensions dominantes de l'indice (score ≥ 60/10
 
 Ces pistes servent à orienter le dialogue avec les directions régionales et provinciales : elles doivent être confrontées au terrain, en particulier aux données des rapports ESU vérifiées par le ST-ESU.
 
-## 11. Limites
+## 12. Limites
 
 - **Déperdition apparente :** à l'échelle d'une province, abandons, migrations et fermetures d'écoles ne se distinguent pas.
 - **Séries courtes et rupture :** sept cohortes avec une cible connue, dont plusieurs années de crise. Une nouvelle vague de fermetures ne peut pas être anticipée par les données passées.
@@ -150,9 +177,11 @@ Ces pistes servent à orienter le dialogue avec les directions régionales et pr
 - **Provinces scindées en 2025 :** valeurs réparties au prorata de la population 2019.
 - **Facteur sécuritaire indirect :** ni ACLED, ni déplacés internes après mars 2023 ; le choc est mesuré par les écoles et les élèves perdus.
 - **Pauvreté figée en 2019 ;** couche OpenStreetMap incomplète, présentée à titre indicatif.
+- **Mise à jour des données :** le modèle n'est pas réentraîné, l'indice des régions n'est pas recalculé et un fichier ne porte que la dernière année ou la suivante. La qualité des valeurs déposées n'est pas évaluée.
+- **Rapport par IA :** il peut contenir des erreurs. Les chiffres sont contrôlés, pas les interprétations ; le texte est à relire avant toute diffusion.
 
-## 12. Reproductibilité
+## 13. Reproductibilité
 
-Une seule commande régénère toutes les sorties : `make all`, ou `python -m pipeline all` sans make. Le pipeline lit le Data Pack en lecture seule, fixe la graine aléatoire et écrit tout dans `outputs/` et `web/public/data/`. Il comprend 42 tests pytest (valeurs de contrôle, sommes, topologie, absence de fuite d'information) et 21 tests de rendu de l'application. Un contrôle automatisé dans un navigateur vérifie l'absence d'erreur console sur 11 vues. Le code, les décisions (`DECISIONS.md`), l'inventaire des données (`DATA_INVENTORY.md`) et le dictionnaire de données (`docs/dictionnaire_donnees.md`) sont versionnés.
+Une seule commande régénère toutes les sorties : `make all`, ou `python -m pipeline all` sans make. Le pipeline lit le Data Pack en lecture seule, fixe la graine aléatoire et écrit tout dans `outputs/` et `web/public/data/`. Il comprend 42 tests pytest (valeurs de contrôle, sommes, topologie, absence de fuite d'information) et 54 tests Vitest : 21 de rendu de l'application et 33 sur le moteur de calcul (conformité avec Python, validation des fichiers) et les fonctions serveur (calcul, quotas, rapport, secret). Un contrôle automatisé dans un navigateur vérifie l'absence d'erreur console sur 11 vues. L'API se lance en local sans compte avec `pnpm api` (dans `web`). Le code, les décisions (`DECISIONS.md`), l'inventaire des données (`DATA_INVENTORY.md`) et le dictionnaire de données (`docs/dictionnaire_donnees.md`) sont versionnés.
 
 <p class="sources">Sources : MEBAPLN/DGESS, annuaires statistiques de l'enseignement primaire 2017-18 à 2024-25 (via CNS) ; INSD, RGPH 2019, volume 3 « Mesure et cartographie de la pauvreté » ; SP/CONASUR, situation des personnes déplacées internes (via HDX) ; IGB/OCHA, limites administratives COD-AB v03 (via HDX, CC BY-IGO) ; © contributeurs OpenStreetMap, établissements d'enseignement (HOT, ODbL 1.0).</p>

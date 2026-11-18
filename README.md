@@ -46,6 +46,18 @@ L'application est une page statique : les données sont pré-calculées et aucun
 - **Netlify ou Vercel** : commande de construction `pnpm --dir web install && pnpm --dir web build`, dossier publié `web/dist`.
 - **Hors ligne** : copier `web/dist/` sur un serveur web local, par exemple `python -m http.server -d web/dist`.
 
+### Backend de calcul et mise à jour des données (Netlify Functions)
+
+La vue « Mettre à jour » dépose un fichier de situation (modèle et exemple fictif dans `web/public/data/`), le valide, puis
+recalcule l'indice, la prévision et un rapport de synthèse avec des fonctions serveur (`web/netlify/functions/`). Le moteur de
+calcul (`web/engine/`) reproduit le pipeline Python, dont il lit les paramètres exportés par `python -m pipeline engine`.
+
+- **En local, sans compte** : `pnpm --dir web api` (API sur le port 8787, stockage en mémoire), puis `pnpm --dir web dev`.
+- **Sur Netlify** : depuis `web/`, `netlify deploy --build --prod` (le glisser-déposer ne déploie pas les fonctions). Variables
+  facultatives dans Netlify : `OPENROUTER_API_KEY` (rapport rédigé par IA), `OPENROUTER_MODEL`, plafonds `LIMIT_*`. Voir
+  `web/netlify.toml` et `web/.env.example`. La clé n'est jamais lue côté navigateur ni écrite dans le code.
+- Sans clé, le rapport de secours (gabarit) est utilisé. Le fichier d'exemple contient des données fictives.
+
 L'état de l'interface (vue, couche, année, échelle, sélection, comparaison) est conservé dans l'URL, par exemple `#/explorer?couche=tap&annee=2024-2025&echelle=prov&sel=BF6402`.
 
 ## Structure

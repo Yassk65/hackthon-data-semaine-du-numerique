@@ -1,0 +1,36 @@
+# Application statique (Vite) + fonctions serveur (calcul en arrière-plan, rapport par modèle de langage).
+#
+# Déploiement par Git : réglez « Base directory » sur `web` dans Netlify (ce fichier est lu à cet endroit).
+# Déploiement par la ligne de commande, depuis le dossier web :  netlify deploy --build --prod
+# Variables à créer dans Netlify (Site configuration > Environment variables), jamais dans le code :
+#   OPENROUTER_API_KEY  clé OpenRouter (facultative : sans elle, le rapport de secours est utilisé)
+#   OPENROUTER_MODEL    modèle principal (facultatif, défaut : anthropic/claude-haiku-5.5)
+#   OPENROUTER_FALLBACK_MODEL  modèle de repli (facultatif, défaut : deepseek/deepseek-v4.1-flash)
+#   LIMIT_JOBS_PER_IP_DAY, LIMIT_REPORTS_PER_IP_DAY, LIMIT_REPORTS_GLOBAL_DAY  plafonds journaliers (facultatifs)
+
+[build]
+  command = "pnpm build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[functions]
+  node_bundler = "esbuild"
+
+[dev]
+  command = "pnpm dev --host 127.0.0.1 --port 5173 --strictPort"
+  targetPort = 5173
+  framework = "#custom"
+
+[[headers]]
+  for = "/data/*"
+  [headers.values]
+    Cache-Control = "public, max-age=300"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"

@@ -7,6 +7,9 @@ import { defineConfig } from "vite";
 export default defineConfig({
   base: "./",
   plugins: [react()],
+  // Fonctions de calcul : sur Netlify elles sont servies sous /api ; en local, `pnpm api` les sert sur le port 8787.
+  server: { proxy: { "/api": "http://127.0.0.1:8787" } },
+  preview: { proxy: { "/api": "http://127.0.0.1:8787" } },
   build: {
     target: "es2020",
     chunkSizeWarningLimit: 1200,

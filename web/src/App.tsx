@@ -1,15 +1,20 @@
-import { Suspense, lazy, useCallback, useEffect, useState } from "react";
+import { Suspense, lazy, useCallback, useEffect, useMemo, useState } from "react";
 import { loadCore, useLoad } from "./data/load";
 import { t } from "./i18n";
 import { type AppState, type View, parseHash, toHash } from "./lib/url";
+import { applyScenario, clearScenario, loadStoredScenario, storeScenario } from "./lib/scenario";
+import { nextYear, shortYear } from "./lib/format";
+import type { ScenarioResult } from "../engine/types";
 import Anticipate from "./views/Anticipate";
 import Method from "./views/Method";
 import Understand from "./views/Understand";
 
 // La carte (MapLibre, ~250 Ko compressés) n'est chargée qu'à l'ouverture de la vue Explorer.
 const Explore = lazy(() => import("./views/Explore"));
+// La vue de mise à jour embarque le moteur de validation : elle n'est chargée qu'à l'ouverture.
+const Update = lazy(() => import("./views/Update"));
 
-const VIEWS: View[] = ["comprendre", "explorer", "anticiper", "methode"];
+const VIEWS: View[] = ["comprendre", "explorer", "anticiper", "methode", "maj"];
 type Theme = "light" | "dark";
 
 function initialTheme(): Theme {
@@ -22,6 +27,14 @@ export default function App() {
   const core = useLoad(loadCore);
   const [state, setState] = useState<AppState>(() => parseHash(location.hash));
   const [theme, setTheme] = useState<Theme>(initialTheme);
+  const [scenario, setScenario] = useState<ScenarioResult | null>(loadStoredScenario);
+
+  // Version mise à jour : un scénario enregistré n'est appliqué que s'il correspond à la référence chargée.
+  const baseCore = core.status === "ready" ? core.data : null;
+  const valid = baseCore && scenario && [baseCore.meta.derniere_annee, nextYear(baseCore.meta.derniere_annee)].includes(scenario.annee) ? scenario : null;
+  const effective = useMemo(() => (baseCore && valid ? applyScenario(baseCore, valid) : baseCore), [baseCore, valid]);
+  const apply = useCallback((res: ScenarioResult, jobId: string | null) => { storeScenario(res, jobId); setScenario(res); }, []);
+  const reset = useCallback(() => { clearScenario(); setScenario(null); }, []);
 
   useEffect(() => {
     const onHash = () => setState(parseHash(location.hash));
@@ -52,7 +65,7 @@ export default function App() {
   }, [state.view]);
 
   return (
-    <div className={`app view-${state.view}`}>
+    <div className={`app view-${state.view}${valid ? " has-scenario" : ""}`}>
       <a className="skip" href="#main">
         {t("app.skip")}
       </a>
@@ -98,27 +111,41 @@ export default function App() {
         </button>
       </header>
 
+      {valid && (
+        <aside className="scenario-banner" role="status">
+          <strong>{t("update.bannerTitle")}</strong>
+          <span>{t("update.bannerText", { year: shortYear(valid.annee), cible: shortYear(valid.cible) })}</span>
+          <button type="button" className="link-btn" onClick={() => set({ view: "maj" })}>{t("update.bannerOpen")}</button>
+          <button type="button" className="link-btn" onClick={reset}>{t("update.bannerReset")}</button>
+        </aside>
+      )}
+
       <main id="main" tabIndex={-1}>
         {core.status === "loading" && <p className="status" role="status">{t("app.loading")}</p>}
         {core.status === "error" && <p className="status status--error" role="alert">{t("app.error", { e: core.error })}</p>}
-        {core.status === "ready" && (
+        {core.status === "ready" && effective && (
           <>
-            {state.view === "comprendre" && <Understand core={core.data} go={set} />}
+            {state.view === "comprendre" && <Understand core={effective} go={set} />}
             {state.view === "explorer" && (
               <Suspense fallback={<p className="status" role="status">{t("app.loadingMap")}</p>}>
-                <Explore core={core.data} state={state} set={set} theme={theme} />
+                <Explore core={effective} state={state} set={set} theme={theme} />
               </Suspense>
             )}
-            {state.view === "anticiper" && <Anticipate core={core.data} state={state} go={set} />}
-            {state.view === "methode" && <Method core={core.data} />}
+            {state.view === "anticiper" && <Anticipate core={effective} state={state} go={set} />}
+            {state.view === "methode" && <Method core={effective} />}
+            {state.view === "maj" && (
+              <Suspense fallback={<p className="status" role="status">{t("app.loading")}</p>}>
+                <Update baseCore={core.data} scenario={valid} onApply={apply} onClear={reset} go={set} />
+              </Suspense>
+            )}
           </>
         )}
       </main>
 
-      {state.view !== "explorer" && core.status === "ready" && (
+      {state.view !== "explorer" && core.status === "ready" && effective && (
         <footer className="footer">
           <p>{t("footer.sources")}</p>
-          <p>{t("footer.generated", { date: core.data.meta.genere_le })}</p>
+          <p>{t("footer.generated", { date: effective.meta.genere_le })}</p>
         </footer>
       )}
     </div>

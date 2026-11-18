@@ -14,5 +14,5 @@
     "skipLibCheck": true,
     "types": ["vite/client", "vitest/globals", "node"]
   },
-  "include": ["src", "vite.config.ts"]
+  "include": ["src", "engine", "netlify", "vite.config.ts"]
 }

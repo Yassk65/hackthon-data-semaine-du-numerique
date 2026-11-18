@@ -2,7 +2,7 @@
 
     python -m pipeline all        # tout régénérer (équivalent de `make all`)
     python -m pipeline <étape>    # une étape : inventory, geo, extract, context, features,
-                                  # quality, index, model, export, figures
+                                  # quality, index, model, export, engine, figures
 
 Les étapes sont déterministes (graine fixée à 42) et n'écrivent jamais dans le Data Pack.
 """
@@ -12,7 +12,8 @@ from __future__ import annotations
 import sys
 import time
 
-STEPS = ["inventory", "geo", "extract", "context", "features", "quality", "index", "model", "export", "figures"]
+STEPS = ["inventory", "geo", "extract", "context", "features", "quality", "index", "model", "export", "engine",
+         "figures"]
 
 
 def run_step(name: str) -> None:
@@ -46,6 +47,9 @@ def run_step(name: str) -> None:
     elif name == "export":
         from pipeline import export
         export.run()
+    elif name == "engine":
+        from pipeline import engine_export
+        engine_export.run()
     elif name == "figures":
         from pipeline import figures
         figures.run()

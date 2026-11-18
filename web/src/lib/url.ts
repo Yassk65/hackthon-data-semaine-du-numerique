@@ -1,6 +1,6 @@
 import type { Scale } from "../data/types";
 
-export type View = "comprendre" | "explorer" | "anticiper" | "methode";
+export type View = "comprendre" | "explorer" | "anticiper" | "methode" | "maj";
 
 export interface AppState {
   view: View;
@@ -24,7 +24,7 @@ export const DEFAULT_STATE: AppState = {
   osm: false,
 };
 
-const VIEWS: View[] = ["comprendre", "explorer", "anticiper", "methode"];
+const VIEWS: View[] = ["comprendre", "explorer", "anticiper", "methode", "maj"];
 
 /** Lit l'état depuis le fragment d'URL : #/explorer?couche=tap&annee=2024-2025&echelle=prov&sel=BF6402 */
 export function parseHash(hash: string): AppState {

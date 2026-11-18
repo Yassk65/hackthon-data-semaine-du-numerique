@@ -20,3 +20,12 @@ web/dist/
 # Système
 .DS_Store
 Thumbs.db
+
+# Secrets et fichiers locaux de Netlify
+.env
+.env.*
+!.env.example
+.netlify/
+
+# Dossier de dépôt (généré par python -m pipeline.livrables)
+livrables/
