@@ -1,7 +1,7 @@
 // Vérification de rendu de l'application construite (dist/) : erreurs console, rendu des vues,
 // captures d'écran (ordinateur, mobile, mode sombre). Usage : node scripts/check.mjs
 // Navigateur : variable CHROME_PATH, sinon Chrome ou Edge aux emplacements Windows/Linux/macOS usuels.
-import { existsSync, mkdirSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, rmSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import puppeteer from "puppeteer-core";
@@ -73,6 +73,34 @@ for (const p of pages) {
   await page.screenshot({ path: join(outDir, `${p.name}.png`), fullPage: Boolean(p.full) });
   const text = await page.evaluate(() => document.body.innerText.length);
   if (text < 200) problems.push(`[${p.name}] contenu presque vide (${text} caractères)`);
+  await page.close();
+}
+
+// Exports : image de la carte, CSV du classement, fiche province imprimée en PDF.
+{
+  const dl = join(outDir, "exports");
+  mkdirSync(dl, { recursive: true });
+  for (const f of readdirSync(dl)) rmSync(join(dl, f));
+  const page = await browser.newPage();
+  await page.setViewport({ width: 1440, height: 900 });
+  page.on("pageerror", (e) => problems.push(`[exports] exception : ${e.message}`));
+  const cdp = await page.createCDPSession();
+  await cdp.send("Browser.setDownloadBehavior", { behavior: "allow", downloadPath: dl });
+  await page.goto(`${base}#/explorer?couche=prediction&echelle=prov&sel=BF6402`, { waitUntil: "networkidle0" });
+  await page.waitForFunction(() => document.querySelectorAll(".map-label").length > 0, { timeout: 20000 });
+  await new Promise((r) => setTimeout(r, 1500));
+  const clickText = (txt) =>
+    page.evaluate((t) => [...document.querySelectorAll("button")].find((b) => b.textContent.trim() === t)?.click(), txt);
+  await clickText("Image de la carte");
+  await clickText("Exporter en CSV");
+  await new Promise((r) => setTimeout(r, 2500));
+  const files = readdirSync(dl);
+  if (!files.some((f) => f.endsWith(".png"))) problems.push("[exports] image PNG non produite");
+  if (!files.some((f) => f.endsWith(".csv"))) problems.push("[exports] CSV non produit");
+  await page.evaluate(() => document.body.classList.add("print-sheet"));
+  await page.emulateMediaType("print");
+  await page.pdf({ path: join(dl, "fiche_seno.pdf"), format: "A4", printBackground: true });
+  console.log(`Exports : ${readdirSync(dl).join(", ")}`);
   await page.close();
 }
 

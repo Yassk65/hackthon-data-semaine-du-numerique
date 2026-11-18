@@ -107,11 +107,13 @@ export default function RankingTable({
     </th>
   );
 
+  // Arrondi à la précision affichée, plus une décimale (évite 0,7000000000000011).
+  const round = (v: number | null) => (v === null ? null : Number(v.toFixed(Math.min(4, result.decimals + 1))));
   const exportCsv = () => {
     const title = layerLabel(def, core);
     downloadCSV(`classement_${def.id}_${scale}_${year}.csv`, [
       [t("table.rank"), t("table.code"), t(`scale.${scale}One`), ...(scale === "prov" ? [t("table.region")] : []), `${title} (${year})`, t("table.delta"), t("table.quality")],
-      ...visible.map((r) => [r.rang, r.code, r.nom, ...(scale === "prov" ? [r.region] : []), r.valeur, r.delta, r.qualite]),
+      ...visible.map((r) => [r.rang, r.code, r.nom, ...(scale === "prov" ? [r.region] : []), round(r.valeur), round(r.delta), r.qualite]),
       [],
       [t("table.csvSource")],
     ]);

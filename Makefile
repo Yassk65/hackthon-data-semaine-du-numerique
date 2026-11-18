@@ -1,16 +1,16 @@
 # Régénération complète : make all
-# Sous Windows sans make : python -m pipeline all (même résultat), puis npm --prefix web run build.
+# Sans make (Windows) : python -m pipeline all, puis pnpm --dir web build et python -m docs.build_note.
 
 PYTHON ?= python
-NPM ?= npm
+PNPM ?= pnpm
 
-.PHONY: all setup pipeline test lint web web-test doc clean
+.PHONY: all setup pipeline test lint web web-test check doc clean
 
-all: pipeline test web doc
+all: pipeline test web web-test check doc
 
 setup:
 	$(PYTHON) -m pip install -r requirements.txt
-	$(NPM) --prefix web ci
+	$(PNPM) --dir web install --frozen-lockfile
 
 pipeline:
 	$(PYTHON) -m pipeline all
@@ -19,13 +19,17 @@ test:
 	$(PYTHON) -m pytest -q
 
 lint:
-	$(PYTHON) -m ruff check pipeline tests
+	$(PYTHON) -m ruff check pipeline tests docs
 
 web:
-	$(NPM) --prefix web run build
+	$(PNPM) --dir web build
 
 web-test:
-	$(NPM) --prefix web test
+	$(PNPM) --dir web test
+
+# Rendu dans un navigateur sans interface : erreurs console et captures (outputs/screens).
+check:
+	$(PNPM) --dir web check
 
 doc:
 	$(PYTHON) -m docs.build_note

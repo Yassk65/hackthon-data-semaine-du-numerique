@@ -1,0 +1,416 @@
+<!doctype html><html lang='fr'><head><meta charset='utf-8'><title>Note technique</title><style>@font-face{font-family:'Source Serif 4';font-weight:400;src:url('../web/node_modules/@fontsource/source-serif-4/files/source-serif-4-latin-400-normal.woff2') format('woff2');}
+@font-face{font-family:'Source Serif 4';font-weight:600;src:url('../web/node_modules/@fontsource/source-serif-4/files/source-serif-4-latin-600-normal.woff2') format('woff2');}
+@font-face{font-family:'Inter';font-weight:400;src:url('../web/node_modules/@fontsource/inter/files/inter-latin-400-normal.woff2') format('woff2');}
+@font-face{font-family:'Inter';font-weight:500;src:url('../web/node_modules/@fontsource/inter/files/inter-latin-500-normal.woff2') format('woff2');}
+@font-face{font-family:'Inter';font-weight:600;src:url('../web/node_modules/@fontsource/inter/files/inter-latin-600-normal.woff2') format('woff2');}
+@page { size: A4; margin: 15mm 16mm 16mm; @bottom-right { content: counter(page); } }
+:root { --ink:#1F1C17; --muted:#6B6458; --rule:#E3DCCF; --accent:#B4462C; --paper:#FBF8F2; }
+html { font: 9.6pt/1.5 'Inter', 'Segoe UI', sans-serif; color: var(--ink); }
+body { margin: 0; }
+h1 { font: 600 23pt/1.12 'Source Serif 4', Georgia, serif; margin: 0 0 4pt; letter-spacing: -0.01em; }
+.subtitle { color: var(--muted); font-size: 9pt; margin: 0 0 14pt; padding-bottom: 10pt; border-bottom: 2px solid var(--ink); }
+h2 { font: 600 13.5pt/1.25 'Source Serif 4', Georgia, serif; margin: 15pt 0 5pt; padding-top: 8pt;
+     background: linear-gradient(var(--accent), var(--accent)) left top / 24pt 2pt no-repeat;
+     break-after: avoid; break-inside: avoid; }
+p { margin: 0 0 6pt; text-align: justify; hyphens: auto; }
+ul { margin: 0 0 6pt; padding-left: 14pt; }
+li { margin-bottom: 2pt; }
+strong { font-weight: 600; }
+code { font: 8.5pt Consolas, monospace; background: #F1ECE2; padding: 0 2pt; border-radius: 2px; }
+table { width: 100%; border-collapse: collapse; margin: 4pt 0 9pt; font-size: 8.2pt; break-inside: avoid; }
+th { text-align: left; font-weight: 600; font-size: 7.4pt; text-transform: uppercase; letter-spacing: .05em;
+     color: var(--muted); border-bottom: 1px solid var(--ink); padding: 3pt 4pt; }
+td { border-bottom: 1px solid var(--rule); padding: 3pt 4pt; vertical-align: top; }
+figure { margin: 6pt 0 10pt; break-inside: avoid; }
+figure img { width: 100%; display: block; }
+figure.right { float: right; width: 44%; margin: 2pt 0 6pt 12pt; }
+figcaption { font-size: 7.8pt; color: var(--muted); margin-top: 3pt; }
+.formula { text-align: center; font: 9pt 'Source Serif 4', serif; background: #F6F1E7; padding: 6pt; border-radius: 3px; }
+.sources { margin-top: 14pt; padding-top: 6pt; border-top: 1px solid var(--rule); font-size: 7.6pt; color: var(--muted); }
+</style></head><body><h1>Cartographier et anticiper le décrochage scolaire au primaire</h1>
+<p class="subtitle">Note technique · Data Challenge Burkina 2026 · Défi 1 « Décrochage scolaire » · version du 18 novembre 2026</p>
+
+<h2>Résumé</h2>
+<p>Au Burkina Faso, l'école primaire a subi une rupture : entre 2021-22 et 2022-23, les effectifs ont baissé de 339 402 élèves, et le nombre d'écoles en activité est passé de 15 756 (2017-18) à 12 780 (2022-23). En 2024-25, le taux d'achèvement varie de 4,5 % (Tapoa) à 87,5 % (Kadiogo).</p>
+<p>Nous proposons un outil d'aide à la décision qui répond à la question du défi : <strong>quelles provinces risquent la plus forte déperdition scolaire l'an prochain, et pourquoi ?</strong> Il comprend :</p>
+<ul>
+<li>une <strong>base de données propre et traçable</strong> : 253 785 valeurs extraites des huit annuaires du primaire (2017-18 à 2024-25), chacune avec son document, sa page, sa ligne et un indicateur de qualité. Les 19 valeurs de contrôle de l'annuaire 2023-24 sont retrouvées à l'identique ;</li>
+<li>une <strong>harmonisation territoriale</strong> vers le découpage de 2025 (17 régions, 47 provinces), utilisé pour toutes les cartes ;</li>
+<li>un <strong>indice composite de risque</strong> transparent (5 dimensions, 12 indicateurs) et un <strong>modèle d'anticipation</strong> validé dans le temps et dans l'espace, avec des intervalles d'incertitude ;</li>
+<li>une <strong>application web</strong> autonome (sans serveur ni tuiles externes), en quatre vues : Comprendre, Explorer, Anticiper, Méthode et données.</li>
+</ul>
+<p>Pour 2025-26, <strong>13 provinces sur 47</strong> ont au moins une chance sur deux de dépasser 15 % de déperdition. Elles se concentrent dans les régions Yaadga (3), Koulsé (2), Liptako (2), Soum (2), Tapoa (2).</p>
+<h2>1. Données et périmètre</h2>
+<p>Le travail porte sur l'enseignement primaire (CP1 à CM2). Les sources viennent du Data Pack officiel. Aucune source externe n'a été intégrée : l'export ACLED (événements de violence), prévu comme source facultative, n'était pas disponible.</p>
+<table>
+<thead>
+<tr>
+<th>Source</th>
+<th>Contenu utilisé</th>
+<th>Années</th>
+<th>Niveau</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Annuaires statistiques du primaire (DGESS, 8 éditions)</td>
+<td>écoles, salles, maîtres, élèves par sexe et milieu, TBA, TBS, TNS, achèvement, taux de flux, effectifs et redoublants par classe</td>
+<td>2017-18 à 2024-25 (historiques depuis 2008-09)</td>
+<td>45 provinces, 13 régions</td>
+</tr>
+<tr>
+<td>Limites COD-AB v03 (IGB/OCHA)</td>
+<td>351 communes avec ancien et nouveau P-code</td>
+<td>2025</td>
+<td>commune</td>
+</tr>
+<tr>
+<td>Cartographie de la pauvreté (RGPH 2019, INSD)</td>
+<td>incidence et profondeur de la pauvreté</td>
+<td>2018-2019</td>
+<td>province, commune</td>
+</tr>
+<tr>
+<td>Déplacés internes (SP/CONASUR)</td>
+<td>stock de PDI par commune</td>
+<td>janv. 2019 à mars 2023</td>
+<td>commune</td>
+</tr>
+<tr>
+<td>Écoles OpenStreetMap (HOT)</td>
+<td>établissements géolocalisés (couche indicative)</td>
+<td>nov. 2026</td>
+<td>point</td>
+</tr>
+</tbody>
+</table>
+<p>Les tableaux de bord, synthèses et dépliants de la DGESS ont servi de contrôle. Les rapports mensuels ESU, en majorité issus de reconnaissance optique (OCR) et non vérifiés, n'ont pas été utilisés : ce sont les annuaires qui mesurent les fermetures d'écoles, par l'évolution du nombre d'écoles en activité.</p>
+<h2>2. Extraction et contrôle de qualité</h2>
+<p><strong>Méthode.</strong> Les CSV du pack restituent les tableaux PDF ligne à ligne. Chaque type de tableau a son parser. Les pages sont repérées par l'intitulé du tableau, car la numérotation change d'une édition à l'autre (« II.7 » en 2017-18, « I.8 » en 2024-25). Les noms de région, en titre de bloc, sont propagés vers les lignes de province. Les noms sont rapprochés d'un référentiel de P-codes qui gère les variantes d'écriture (Komondjari, Komandjoari, Komandjari…). La sortie est au format « tidy » : unité, année, indicateur, classe, sexe, milieu, statut, valeur, source, page, ligne, indicateur de qualité.</p>
+<p><strong>Aucune correction manuelle silencieuse.</strong> Les anomalies de la source sont traitées par des règles explicites, signalées par un indicateur de qualité et consignées dans le journal d'extraction (34 entrées) :</p>
+<ul>
+<li>45 valeurs où deux nombres étaient fusionnés dans une même cellule. Elles sont séparées seulement quand la contrainte Total = Garçons + Filles donne une solution unique ;</li>
+<li>336 valeurs d'historique dont le libellé d'année est abîmé (« 202122023 », année répétée). L'année est alors déduite de la position du bloc ;</li>
+<li>un bloc dupliqué écarté, et des lignes où une colonne urbain/rural est vide (seul le total est retenu) ;</li>
+<li>la Komandjari en 2022-23 : elle est absente du tableau des écoles alors que l'historique indique 0 élève. Elle est traitée comme « aucune école en activité » et signalée.</li>
+</ul>
+<p><strong>Contrôles automatiques (pytest).</strong></p>
+<table>
+<thead>
+<tr>
+<th>Contrôle</th>
+<th>Résultat</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Valeurs de contrôle de l'annuaire 2023-24 (national, Centre, Sahel, Est, Yagha, Boucle du Mouhoun)</td>
+<td>19 / 19</td>
+</tr>
+<tr>
+<td>Somme des provinces = total régional et national publiés</td>
+<td>98,3 % de 50 344 comparaisons</td>
+</tr>
+<tr>
+<td>Taux = numérateur / dénominateur (TBA, TBS, TNS, achèvement)</td>
+<td>100,0 % de 5 664</td>
+</tr>
+<tr>
+<td>Promotion + redoublement + abandon = 100 (tableau des flux)</td>
+<td>100,0 % de 6 885</td>
+</tr>
+<tr>
+<td>Même année publiée dans plusieurs éditions : valeurs identiques</td>
+<td>98,5 % de 674</td>
+</tr>
+</tbody>
+</table>
+<p>Les écarts de somme restants concernent surtout les blocs régionaux des historiques. Dans l'édition 2017-18, par exemple, trois années du Centre-Sud portent des valeurs identiques dans la source. Ils sont listés dans <code>outputs/quality/</code>, sans correction. Les totaux régionaux et nationaux utilisés par l'outil sont recalculés à partir des provinces.</p>
+<h2>3. Harmonisation territoriale</h2>
+<p>Les annuaires suivent l'ancien découpage (13 régions, 45 provinces), alors que les cartes doivent suivre celui de 2025 (17 régions, 47 provinces). Le passage repose sur les 351 communes, identiques dans les deux découpages : COD-AB associe à chacune son ancien et son nouveau P-code. Les polygones des quatre découpages sont obtenus par fusion des communes, après une simplification qui préserve les limites partagées. Les tests vérifient 13, 45, 17 et 47 entités valides, sans trou ni chevauchement.</p>
+<figure class="right"><img src="figures/reforme.png" alt="Carte des 17 régions actuelles et des 13 anciennes régions"><figcaption>Découpage de 2025 (trait plein) et anciennes régions (tirets).</figcaption></figure>
+
+<ul>
+<li><strong>43 provinces</strong> correspondent chacune à une ancienne province (parfois renommée : Kossi devenue Kossin, Sanmatenga devenue Sandbondtenga, Oubritenga devenue Bassitenga).</li>
+<li><strong>Le Soum et la Tapoa</strong> ont été scindés : en Djelgodji et Karo-Peli pour le premier, en Dyamongou et Gobnangou pour le second. Leurs effectifs sont répartis au prorata de la population 2019 des communes, tirée de la cartographie de la pauvreté. Les taux sont donc identiques dans les deux moitiés. Ces valeurs sont signalées dans l'outil et pénalisées dans le score de qualité. Pour la pauvreté, l'agrégation des communes donne une valeur exacte.</li>
+<li><strong>Chaque région actuelle est une union d'anciennes provinces entières</strong> : ses totaux sont exacts. Une somme n'est calculée que si toutes les provinces membres sont renseignées : il n'y a aucun total partiel.</li>
+</ul>
+<p>Contrôle : les totaux nationaux sont identiques quel que soit le découpage (test automatique).</p>
+<h2>4. Indicateurs</h2>
+<p><strong>Le taux d'abandon publié est résiduel.</strong> Dans les annuaires, l'abandon est calculé par différence (100 − promotion − redoublement), puis borné à zéro. 246 taux publiés valent 0,0 ; pour 243 d'entre eux, le calcul de cohorte donne une déperdition nulle ou négative. Ce taux mesure mal le décrochage, surtout là où les effectifs varient fortement.</p>
+<p><strong>Déperdition reconstituée (méthode de la cohorte reconstituée, UNESCO).</strong> À partir des effectifs E et des redoublants R par classe c et année t :</p>
+<p class="formula">promotion p(c,t) = [E(c+1,t+1) − R(c+1,t+1)] / E(c,t) · redoublement r(c,t) = R(c,t+1) / E(c,t)<br>déperdition CP1-CM1 = 1 − Σ<sub>c</sub> [E(c+1,t+1) − R(c+1,t+1) + R(c,t+1)] / Σ<sub>c</sub> E(c,t)</p>
+
+<p>Cette reconstitution retrouve les taux publiés à 0,15 point près dans 96 % des cas pour le redoublement, et dans 82 % des cas pour l'abandon. Les écarts se concentrent là où le taux publié est borné. Elle couvre aussi les années 2014-15 à 2016-17, absentes des annuaires étudiés. À l'échelle d'une province, il s'agit d'une <strong>déperdition apparente</strong> : elle inclut les abandons, les départs nets vers d'autres provinces et les élèves des écoles fermées. C'est la cible du modèle.</p>
+<figure><img src="figures/reconstruction.png" alt="Taux publiés contre taux reconstitués"><figcaption>Taux publiés (annuaires) contre taux reconstitués, provinces, 2016-17 à 2023-24. Les taux d'abandon publiés nuls correspondent à des déperditions reconstituées négatives.</figcaption></figure>
+
+<p><strong>Autres variables (par province et par année).</strong> Taux brut de scolarisation et d'achèvement, par sexe, et indice de parité ; élèves par maître et par salle ; part rurale et part du privé ; survie jusqu'au CM2 ; redoublement ; pauvreté 2019 ; déplacés internes, en part de la population. Deux indicateurs servent de proxy du choc sécuritaire : la variation des écoles en activité et celle des élèves par rapport à leur maximum.</p>
+<figure><img src="figures/series_nationales.png" alt="Séries nationales"><figcaption>Séries nationales : élèves, écoles en activité, déperdition observée (bande grise : années de crise 2019-2023).</figcaption></figure>
+
+<h2>5. Diagnostic cartographique</h2>
+<figure><img src="figures/cartes_contexte.png" alt="Quatre cartes de contexte"><figcaption>Provinces, découpage de 2025. Points : données fragiles (score de qualité inférieur à 60/100).</figcaption></figure>
+
+<p>En 2024-25, les régions où l'achèvement est le plus faible sont Tapoa (4,5 %), Soum (9,0 %), Sirba (10,4 %). Ce sont aussi celles qui ont perdu le plus d'écoles depuis 2017-18 (Soum −88 %, Tapoa −83 %, Liptako −78 %, Sirba −63 %, Sourou −55 %). À l'inverse, le taux brut de scolarisation dépasse 100 % dans les régions Kadiogo, Oubri, Nando, Nazinon. Ces taux montrent que les dénominateurs (projections du RGPH 2019) ne suivent pas les déplacements de population : nous utilisons de préférence des indicateurs fondés sur les seuls effectifs (déperdition, survie, évolution).</p>
+<h2>6. Indice composite de risque</h2>
+<p>L'indice résume la situation observée d'une province en 12 indicateurs regroupés en 5 dimensions : <strong>parcours</strong> (déperdition et redoublement de la cohorte précédente, survie), <strong>accès</strong> (achèvement, scolarisation), <strong>choc sécuritaire</strong> (écoles et élèves perdus depuis le maximum), <strong>conditions d'accueil</strong> (élèves par maître et par salle), <strong>vulnérabilité</strong> (pauvreté, écart filles-garçons, ruralité).</p>
+<ul>
+<li><strong>Normalisation :</strong> chaque indicateur est converti en rang centile dans l'année (0 = situation la plus favorable, 100 = la plus défavorable). Ce choix résiste aux valeurs extrêmes des petites provinces.</li>
+<li><strong>Pondération :</strong> chaque dimension pèse 20 %, et la moyenne ne porte que sur les dimensions renseignées.</li>
+<li><strong>Classes :</strong> les quintiles de l'année, sur 5 niveaux de « très faible » à « très élevé ».</li>
+<li><strong>Robustesse :</strong> la corrélation de rang avec une pondération par analyse en composantes principales est de 0,86, avec une pondération entropique de 0,98. Sur 2 000 jeux de poids tirés au hasard (loi de Dirichlet), le rang d'une province varie en moyenne dans une fourchette de 20 places. Chaque fiche affiche cette fourchette et les trois facteurs dominants.</li>
+</ul>
+<h2>7. Modèle d'anticipation</h2>
+<p><strong>Cible.</strong> La déperdition apparente du passage de l'année t à t+1, plafonnée à [0 ; 60] %. <strong>Variables.</strong> Elles sont connues à la fin de l'année t, sans aucune information de t+1 (test automatique) : déperdition de la cohorte précédente et moyenne des cohortes passées, survie, redoublement, variation des effectifs, élèves et écoles perdus depuis le maximum, achèvement, scolarisation, parité, élèves par maître, part rurale et part du privé, pauvreté. Les déplacés internes sont exclus du modèle, faute de données après mars 2023. <strong>Données.</strong> 314 observations (45 anciennes provinces, cohortes 2017-18 à 2023-24). L'apprentissage se fait sur l'ancien découpage ; la prévision est calculée sur les 47 provinces actuelles avec les mêmes coefficients.</p>
+<p><strong>Références et règle de sélection, fixées à l'avance.</strong> Deux références naïves : la persistance (même déperdition que l'an passé) et la moyenne historique de la province. Candidats : régressions ridge, de Huber et médiane (régularisées), gradient boosting. Un modèle linéaire n'est éligible que s'il bat les deux références, en erreur absolue moyenne (MAE), en validation <strong>temporelle</strong> (fenêtre croissante : on apprend sur le passé et on teste l'année suivante, pour 4 années) <strong>et</strong> en validation <strong>spatiale</strong> (une région entière exclue). Parmi les éligibles, on retient la meilleure corrélation de rang. Les arbres ne sont retenus que s'ils font au moins 5 % mieux que les autres dans les deux validations.</p>
+<table>
+<thead>
+<tr>
+<th>Modèle</th>
+<th>MAE temporelle</th>
+<th>Spearman temporel</th>
+<th>MAE spatiale</th>
+<th>Spearman spatial</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Persistance (an passé)</td>
+<td>12,47</td>
+<td>0,15</td>
+<td>10,05</td>
+<td>0,33</td>
+</tr>
+<tr>
+<td>Moyenne historique de la province</td>
+<td>10,52</td>
+<td>0,35</td>
+<td>10,58</td>
+<td>−0,42</td>
+</tr>
+<tr>
+<td>Régression ridge</td>
+<td>11,81</td>
+<td>0,41</td>
+<td>8,85</td>
+<td>0,54</td>
+</tr>
+<tr>
+<td>Régression de Huber</td>
+<td>10,53</td>
+<td>0,48</td>
+<td>8,01</td>
+<td>0,54</td>
+</tr>
+<tr>
+<td>Régression médiane <strong>(retenu)</strong></td>
+<td>9,84</td>
+<td>0,36</td>
+<td>8,54</td>
+<td>0,45</td>
+</tr>
+<tr>
+<td>Gradient boosting</td>
+<td>11,43</td>
+<td>0,40</td>
+<td>7,96</td>
+<td>0,58</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Résultat.</strong> Modèle retenu : régression médiane (linéaires éligibles : régression médiane). Sa MAE temporelle est inférieure de 7 % à celle de la meilleure référence. Le gradient boosting n'est pas retenu : en validation temporelle, sa MAE (11,43) ne fait pas 5 % mieux que la meilleure référence (10,52) et que le modèle retenu (9,84), bien qu'il soit le meilleur en validation spatiale (7,96 contre 10,05 pour la meilleure référence). Le classement des provinces reste difficile d'une année à l'autre (Spearman de 0,36), car la crise a déplacé les zones de déperdition. <strong>L'alerte</strong> (déperdition ≥ 15 %) est estimée par une régression logistique distincte : AUC de 0,71 en validation temporelle et 0,82 en validation spatiale, contre 0,54 pour la persistance.</p>
+<figure><img src="figures/validation.png" alt="Erreur par année testée et calibration"><figcaption>Gauche : erreur absolue moyenne par année testée. Droite : calibration des probabilités d'alerte (hors échantillon).</figcaption></figure>
+
+<p><strong>Incertitude.</strong> Les intervalles viennent d'une prédiction conforme normalisée par la volatilité passée de chaque province. Les quantiles sont estimés sur les résidus hors échantillon. Couverture réelle de l'intervalle à 80 %, mesurée sur une année non utilisée pour le calibrer : 64 % (2021-22), 100 % (2022-23), 98 % (2023-24). Les provinces dont la déperdition a le plus varié ont les intervalles les plus larges (Yagha, Karo-Peli, Djelgodji) : leur prévision se lit comme un signal d'alerte, pas comme une valeur précise.</p>
+<h2>8. Résultats : provinces à surveiller en 2025-26</h2>
+<figure><img src="figures/carte_prevision.png" alt="Carte de la déperdition anticipée et de la probabilité d'alerte"><figcaption>Prévision pour le passage de 2024-25 à 2025-26, découpage de 2025.</figcaption></figure>
+
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Province</th>
+<th>Région</th>
+<th>Prévision</th>
+<th>Intervalle à 80 %</th>
+<th>P(alerte)</th>
+<th>Facteurs dominants (indice 2024-25)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Yagha</td>
+<td>Liptako</td>
+<td>17,8 %</td>
+<td>0 à 60 %</td>
+<td>46 %</td>
+<td>faible achèvement ; écoles fermées depuis le pic ; élèves par maître</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Karo-Peli</td>
+<td>Soum</td>
+<td>15,3 %</td>
+<td>0 à 60 %</td>
+<td>77 %</td>
+<td>perte d'élèves depuis le pic ; écoles fermées depuis le pic ; faible scolarisation</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Djelgodji</td>
+<td>Soum</td>
+<td>15,3 %</td>
+<td>0 à 60 %</td>
+<td>71 %</td>
+<td>écoles fermées depuis le pic ; perte d'élèves depuis le pic ; faible scolarisation</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Komandjari</td>
+<td>Sirba</td>
+<td>15,0 %</td>
+<td>0 à 60 %</td>
+<td>22 %</td>
+<td>écoles fermées depuis le pic ; faible achèvement ; faible scolarisation</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Oudalan</td>
+<td>Liptako</td>
+<td>14,6 %</td>
+<td>6 à 23 %</td>
+<td>83 %</td>
+<td>élèves par salle ; élèves par maître ; écoles fermées depuis le pic</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Séno</td>
+<td>Liptako</td>
+<td>14,5 %</td>
+<td>0 à 58 %</td>
+<td>80 %</td>
+<td>élèves par salle ; élèves par maître ; écoles fermées depuis le pic</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Kompienga</td>
+<td>Goulmou</td>
+<td>14,2 %</td>
+<td>0 à 60 %</td>
+<td>46 %</td>
+<td>élèves par salle ; élèves par maître ; faible scolarisation</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Dyamongou</td>
+<td>Tapoa</td>
+<td>13,9 %</td>
+<td>1 à 26 %</td>
+<td>71 %</td>
+<td>perte d'élèves depuis le pic ; faible scolarisation ; faible achèvement</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Gobnangou</td>
+<td>Tapoa</td>
+<td>13,9 %</td>
+<td>1 à 26 %</td>
+<td>70 %</td>
+<td>perte d'élèves depuis le pic ; faible scolarisation ; faible achèvement</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Loroum</td>
+<td>Yaadga</td>
+<td>13,9 %</td>
+<td>0 à 50 %</td>
+<td>70 %</td>
+<td>élèves par salle ; élèves par maître ; faible achèvement</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Namentenga</td>
+<td>Koulsé</td>
+<td>13,0 %</td>
+<td>0 à 52 %</td>
+<td>70 %</td>
+<td>faible scolarisation ; faible achèvement ; écoles fermées depuis le pic</td>
+</tr>
+<tr>
+<td>12</td>
+<td>Koulpélogo</td>
+<td>Nakambé</td>
+<td>13,0 %</td>
+<td>0 à 56 %</td>
+<td>92 %</td>
+<td>pauvreté ; écart filles-garçons ; ruralité</td>
+</tr>
+</tbody>
+</table>
+<h2>9. L'application web</h2>
+<figure><img src="figures/application_explorer.png" alt="Vue Explorer de l'application"><figcaption>Vue Explorer : carte des provinces, classement synchronisé, fiche de la province.</figcaption></figure>
+
+<p>L'application est une page statique (Vite, React, TypeScript, MapLibre GL), déployable gratuitement sur GitHub Pages, Netlify ou Vercel. La carte est construite sur nos propres polygones, sans tuiles ni polices externes : elle fonctionne avec une connexion faible. Les couches lourdes (écoles OSM, modèle, journal de qualité) sont chargées à la demande.</p>
+<ul>
+<li><strong>Comprendre</strong> : chiffres d'accroche, trois constats et mode d'emploi, tous calculés à partir des données.</li>
+<li><strong>Explorer</strong> : carte plein écran à deux échelles (régions et provinces), 11 couches, dont une carte bivariée risque × fermetures. Curseur temporel avec lecture animée, comparaison avant/après, hachures pour les données manquantes et points pour les données fragiles. Classement triable et filtrable, synchronisé avec la carte, et recherche. La fiche province présente les indicateurs clés, les mini-graphiques, l'écart filles-garçons, le rang, la prévision avec son intervalle, les facteurs, la qualité et les sources. On peut comparer deux provinces. Exports : image PNG, CSV, fiche imprimable en PDF. Le lien conserve la vue partagée.</li>
+<li><strong>Anticiper</strong> : classement 2025-26, comparaison du modèle aux références, incertitude, importance des variables et pistes d'action.</li>
+<li><strong>Méthode et données</strong> : sources et licences, définitions, table de correspondance des découpages, journal de qualité, limites.</li>
+</ul>
+<p>Accessibilité : contrastes AA, navigation au clavier, rôles ARIA. Une alternative textuelle décrit la carte et le tableau de classement en donne toutes les valeurs. Le mode sombre et la préférence « mouvement réduit » sont respectés. Toutes les valeurs affichées proviennent des fichiers exportés par le pipeline.</p>
+<h2>10. Recommandations par type de province</h2>
+<p>Les pistes sont déduites des dimensions dominantes de l'indice (score ≥ 60/100) et de l'écart filles-garçons (indice de parité inférieur à 0,95). Elles concernent les provinces prioritaires : indice élevé ou probabilité d'alerte d'au moins 50 %.</p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Provinces prioritaires concernées</th>
+<th>Pistes d'action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Éducation en situation d'urgence</td>
+<td>Bam, Banwa, Djelgodji, Dyamongou, Gnagna, Gobnangou, Karo-Peli, Komandjari, Kompienga, Loroum, Namentenga, Nayala, Oudalan, Sourou, Yagha</td>
+<td>espaces temporaires d'apprentissage et réouverture progressive des écoles fermées ; redéploiement et prime des enseignants vers les écoles d'accueil ; inscription et suivi nominatif des élèves déplacés internes ; cantines et soutien psychosocial dans les écoles d'accueil</td>
+</tr>
+<tr>
+<td>Accès et maintien</td>
+<td>Djelgodji, Dyamongou, Gnagna, Gobnangou, Karo-Peli, Komandjari, Kossin, Koulpélogo, Namentenga, Sourou, Séno, Yagha</td>
+<td>campagnes d'inscription au CP1 et recherche des enfants non scolarisés ; passerelles de l'éducation non formelle vers le primaire ; écoles satellites pour rapprocher l'offre des villages</td>
+</tr>
+<tr>
+<td>Appui à la scolarisation des filles</td>
+<td>Banwa, Djelgodji, Karo-Peli, Kompienga, Kossin, Koulpélogo, Oudalan, Sourou, Séno, Yagha</td>
+<td>bourses et kits pour les filles ; latrines séparées et points d'eau ; mentorat et lutte contre le mariage précoce</td>
+</tr>
+<tr>
+<td>Capacité d'accueil</td>
+<td>Bam, Banwa, Kompienga, Kossin, Loroum, Nayala, Oudalan, Sandbondtenga, Séno, Yatenga</td>
+<td>affectation prioritaire de nouveaux enseignants ; construction ou réhabilitation de salles de classe (remplacement des paillotes) ; équipement en tables-bancs et manuels</td>
+</tr>
+<tr>
+<td>Parcours et réussite</td>
+<td>Sandbondtenga, Yatenga, Zondoma</td>
+<td>détection précoce des absences répétées et alerte au niveau de l'école ; remédiation ciblée au CE1 et au CM1, classes où la déperdition est la plus forte ; suivi nominatif des élèves non réinscrits à la rentrée</td>
+</tr>
+<tr>
+<td>Vulnérabilité des familles</td>
+<td>Koulpélogo</td>
+<td>cantines scolaires et kits scolaires ; sensibilisation contre le travail des enfants (orpaillage) et le mariage précoce ; articulation avec les transferts sociaux</td>
+</tr>
+</tbody>
+</table>
+<p>Ces pistes servent à orienter le dialogue avec les directions régionales et provinciales : elles doivent être confrontées au terrain, en particulier aux données des rapports ESU vérifiées par le ST-ESU.</p>
+<h2>11. Limites</h2>
+<ul>
+<li><strong>Déperdition apparente :</strong> à l'échelle d'une province, abandons, migrations et fermetures d'écoles ne se distinguent pas.</li>
+<li><strong>Séries courtes et rupture :</strong> sept cohortes avec une cible connue, dont plusieurs années de crise. Une nouvelle vague de fermetures ne peut pas être anticipée par les données passées.</li>
+<li><strong>Dénominateurs :</strong> le RGPH 2019, projeté, n'intègre pas les déplacements depuis 2019, d'où des taux supérieurs à 100 % ou anormalement bas.</li>
+<li><strong>Provinces scindées en 2025 :</strong> valeurs réparties au prorata de la population 2019.</li>
+<li><strong>Facteur sécuritaire indirect :</strong> ni ACLED, ni déplacés internes après mars 2023 ; le choc est mesuré par les écoles et les élèves perdus.</li>
+<li><strong>Pauvreté figée en 2019 ;</strong> couche OpenStreetMap incomplète, présentée à titre indicatif.</li>
+</ul>
+<h2>12. Reproductibilité</h2>
+<p>Une seule commande régénère toutes les sorties : <code>make all</code>, ou <code>python -m pipeline all</code> sans make. Le pipeline lit le Data Pack en lecture seule, fixe la graine aléatoire et écrit tout dans <code>outputs/</code> et <code>web/public/data/</code>. Il comprend 42 tests pytest (valeurs de contrôle, sommes, topologie, absence de fuite d'information) et 21 tests de rendu de l'application. Un contrôle automatisé dans un navigateur vérifie l'absence d'erreur console sur 11 vues. Le code, les décisions (<code>DECISIONS.md</code>), l'inventaire des données (<code>DATA_INVENTORY.md</code>) et le dictionnaire de données (<code>docs/dictionnaire_donnees.md</code>) sont versionnés.</p>
+<p class="sources">Sources : MEBAPLN/DGESS, annuaires statistiques de l'enseignement primaire 2017-18 à 2024-25 (via CNS) ; INSD, RGPH 2019, volume 3 « Mesure et cartographie de la pauvreté » ; SP/CONASUR, situation des personnes déplacées internes (via HDX) ; IGB/OCHA, limites administratives COD-AB v03 (via HDX, CC BY-IGO) ; © contributeurs OpenStreetMap, établissements d'enseignement (HOT, ODbL 1.0).</p></body></html>

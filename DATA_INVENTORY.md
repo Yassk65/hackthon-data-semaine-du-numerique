@@ -1,6 +1,21 @@
 # Inventaire des données : Défi 1 « Décrochage scolaire »
 
-Version Phase 0 du 18/11/2026. Ce document recense les fichiers du Data Pack officiel utiles au Défi 1, leur contenu, leur couverture et l'état de leur exploitation. Il sera mis à jour à chaque phase.
+Mise à jour du 18/11/2026 (version finale). Ce document recense les fichiers du Data Pack officiel utiles au Défi 1, leur contenu, leur couverture et l'état de leur exploitation.
+
+## État d'exploitation (version finale)
+
+| Source | État | Module | Sortie |
+|---|---|---|---|
+| Annuaires du primaire, 8 éditions : tableaux I.1 à I.7 et historiques par classe | **extrait et contrôlé** : 253 785 valeurs, 19/19 valeurs de contrôle | `pipeline/extract_annuaires.py` | `outputs/tables/annuaires_primaire_tidy.csv` |
+| COD-AB v03 (classeur et GeoJSON) | **utilisé** : référentiel ancien/actuel, polygones 13/45/17/47 | `pipeline/geo.py` | `outputs/geo/`, `web/public/data/geo_*.json` |
+| Cartographie de la pauvreté NADA275 (annexe 4) | **extrait** : 45 provinces, 17 communes du Soum et de la Tapoa | `pipeline/extract_context.py` | `outputs/tables/pauvrete_*.csv` |
+| PDI CONASUR (`idps4.xlsx`) | **extrait** : 2018-19 à 2022-23 | `pipeline/extract_context.py` | `outputs/tables/pdi_communes_annee_scolaire.csv` |
+| Écoles OSM | **utilisé** : couche indicative | `pipeline/extract_context.py` | `web/public/data/ecoles_osm.json` |
+| Tableaux de bord, synthèses, dépliants | contrôle visuel des totaux nationaux uniquement | — | — |
+| Rapports ESU | non utilisés (OCR non vérifié, D-020) | — | — |
+| Projections INSD, EHCVM 2021, EDS 2021, annuaires régionaux et nationaux | non utilisés dans la version finale (redondants ou niveau régional seulement) | — | — |
+
+Les sections ci-dessous sont l'inventaire de la Phase 0.
 
 - Emplacement du pack : `DataPack_DCB_2026/` (sources PDF/XLSX/SHP) et `DataPack_DCB_2026/data/` (jumeaux CSV). Le pack est en lecture seule et n'est pas versionné (voir DECISIONS.md, D-001).
 - Inventaire machine complet (une ligne par fichier, taille, pages, lignes, méthode d'extraction) : `python -m pipeline.inventory` produit `outputs/inventory/inventaire_fichiers.csv`.

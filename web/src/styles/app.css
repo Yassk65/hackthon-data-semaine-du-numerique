@@ -1693,14 +1693,27 @@ tr.is-selected {
     margin: 14mm;
   }
 
-  :root {
+  /* L'impression utilise toujours la charte claire, même en mode sombre. */
+  :root,
+  :root[data-theme="dark"] {
     --paper: #fff;
     --paper-2: #f6f3ee;
+    --paper-3: #ece5d8;
+    --ink: #1f1c17;
+    --ink-2: #3a352d;
+    --muted: #6b6458;
+    --rule: #e3dccf;
+    --accent: #b4462c;
+    --accent-soft: #f3dfd5;
+    --worse: #a8401f;
+    --better: #1c6b5e;
+    color-scheme: light;
   }
 
-  body {
+  body,
+  .explore-panel {
     background: #fff;
-    color: #000;
+    color: #1f1c17;
   }
 
   .topbar,
