@@ -52,7 +52,8 @@ def clean(v, nd=2):
 
 def write(name: str, obj) -> int:
     WEB.mkdir(parents=True, exist_ok=True)
-    txt = json.dumps(obj, ensure_ascii=False, separators=(",", ":"))
+    # allow_nan=False : un NaN (JSON invalide) fait échouer l'export au lieu de casser l'application.
+    txt = json.dumps(obj, ensure_ascii=False, separators=(",", ":"), allow_nan=False)
     (WEB / name).write_text(txt, encoding="utf-8")
     return len(txt.encode("utf-8"))
 
@@ -135,8 +136,8 @@ def risk_records(idx: pd.DataFrame, preds: pd.DataFrame) -> dict:
         out.setdefault(r.code, {"indice": {}, "prediction": {}})["indice"][r.annee_scolaire] = {
             "score": clean(r.indice, 1), "classe": int(r.classe), "rang": int(r.rang),
             "rang_p05": int(r.rang_p05), "rang_p95": int(r.rang_p95),
-            "proba_q5": clean(r.proba_quintile_superieur, 2), "facteurs": r.facteurs or "",
-            "dimension": r.dimension_dominante,
+            "proba_q5": clean(r.proba_quintile_superieur, 2), "facteurs": r.facteurs if isinstance(r.facteurs, str) else "",
+            "dimension": r.dimension_dominante if isinstance(r.dimension_dominante, str) else "",
             "dims": {d: clean(getattr(r, f"dim_{d}"), 1) for d in DIMENSIONS},
             "acp": clean(r.indice_acp, 1), "entropie": clean(r.indice_entropie, 1)}
     for r in preds.itertuples(index=False):
