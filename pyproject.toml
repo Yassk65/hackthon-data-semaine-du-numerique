@@ -1,0 +1,16 @@
+[project]
+name = "decrochage-burkina"
+version = "1.0.0"
+description = "Data Challenge Burkina 2026, Défi 1 : cartographie et anticipation du décrochage scolaire au primaire"
+requires-python = ">=3.11"
+
+[tool.ruff]
+line-length = 130
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "B", "I"]
+ignore = ["B905"]  # zip() sans strict= : les séquences zippées ont des longueurs garanties par construction
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
