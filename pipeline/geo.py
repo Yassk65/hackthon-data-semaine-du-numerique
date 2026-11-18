@@ -80,6 +80,10 @@ def communes() -> pd.DataFrame:
     a3 = pd.read_excel(CODAB_XLSX, sheet_name="bfa_admin3")
     a2 = pd.read_excel(CODAB_XLSX, sheet_name="bfa_admin2")
     a1 = pd.read_excel(CODAB_XLSX, sheet_name="bfa_admin1")
+    # Noms d'affichage : variante française accentuée (adm*_name1) quand elle existe.
+    a3 = a3.copy()
+    for lvl in (1, 2, 3):
+        a3[f"adm{lvl}_name"] = a3[f"adm{lvl}_name1"].fillna(a3[f"adm{lvl}_name"])
     df = a3[["adm3_pcode", "adm3_name", "adm2_pcode", "adm2_name", "adm1_pcode", "adm1_name",
              "adm3_pcode_old", "area_sqkm"]].copy()
     df["old_prov_code"] = df["adm3_pcode_old"].str[:6]

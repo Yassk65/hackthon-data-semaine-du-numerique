@@ -263,11 +263,23 @@ def quality_score(ind: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
+def exact_split_poverty(ind: pd.DataFrame) -> pd.DataFrame:
+    """Provinces actuelles issues d'une scission : pauvreté exacte (agrégation des communes 2019)."""
+    pov = pd.read_csv(TABLES / "pauvrete_provinces_actuelles.csv", sep=";").set_index("prov_code")
+    split = ind.split_estime.fillna(False).astype(bool) & ind.code.isin(pov.index)
+    ind.loc[split, "pauvrete"] = ind.loc[split, "code"].map(pov.pauvrete_incidence)
+    ind.loc[split, "pauvrete_profondeur"] = ind.loc[split, "code"].map(pov.pauvrete_profondeur)
+    ind.loc[split, "population_2019"] = ind.loc[split, "code"].map(pov.population_2019)
+    return ind
+
+
 def build_all(tidy: pd.DataFrame) -> dict[str, pd.DataFrame]:
     base = build_base(tidy)
     res = {"base": base}
     for target in ["old_prov", "old_reg", "prov", "reg", "national"]:
         ind = compute_indicators(aggregate(base, target))
+        if target == "prov":
+            ind = exact_split_poverty(ind)
         ind = ind.merge(quality_score(ind), on=["code", "annee_scolaire"])
         res[target] = ind
     return res
